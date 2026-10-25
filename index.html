@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio de Bioquímica y Biofísica Médica | UCCuyo</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            accent: {
+              DEFAULT: '#436600',
+              hover: '#344f00',
+              light: '#f4f7ee'
+            },
+            brandNavy: '#0f172a',
+            brandBlue: '#1e3a8a',
+            accentCyan: '#0284c7',
+            aminoRed: '#e11d48',
+            zwitterionGreen: '#059669',
+            bioGold: '#d97706',
+            uccuyoWine: '#831843'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- KaTeX for High-Fidelity Chemical and Mathematical Formulae -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Three.js for 3D Molecular Anatomy -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- FontAwesome 6 for biomedical icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .text-accent { color: #436600; }
+    .bg-accent { background-color: #436600; }
+    .bg-accent-hover:hover { background-color: #344f00; }
+    .bg-accent-light { background-color: #f4f7ee; }
+    .border-accent { border-color: #436600; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .katex { font-size: 1.05em !important; }
+    .katex-display {
+      margin: 0.65em 0 !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.25rem 0;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    .math-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f4f7ee 100%);
+      border-left: 4px solid #436600;
+    }
+    .clinical-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+      border-left: 4px solid #0284c7;
+    }
+
+    /* Custom Range Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #436600;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6px;
+      box-shadow: 0 2px 5px rgba(67, 102, 0, 0.4);
+      border: 2px solid #ffffff;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      background: #344f00;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-accent selection:text-white">
+
+  <!-- Cabecera Institucional UCCuyo -->
+  <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-white font-bold text-xl shadow-md">
+          Q
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-gray-800 tracking-wide uppercase">QUÍMICA & BIOQUÍMICA MÉDICA</h1>
+          <p class="text-xs text-gray-500 font-semibold">PreMédico (Facultad de Cs. Médicas - UCCuyo)</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <!-- Botón Guía de Uso -->
+        <button onclick="openTutorial()" class="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white text-xs font-semibold rounded-lg shadow-sm hover:bg-accent-hover transition">
+          <i class="fa-solid fa-circle-question text-sm"></i>
+          <span>Guía de Uso</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal con Menú Lateral Oficial Vesalio -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6">
+    
+    <!-- Menú de Navegación Lateral Oficial -->
+    <nav class="w-full lg:w-64 flex flex-row lg:flex-col gap-2 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 overflow-x-auto lg:overflow-x-visible whitespace-nowrap lg:whitespace-normal sticky top-20 h-fit shrink-0">
+      <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn bg-accent text-white flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition shadow-sm flex items-center gap-2.5">
+        <i class="fa-solid fa-atom w-4 text-center"></i>
+        <span>1. Arquitectura & Quiralidad</span>
+      </button>
+      <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5">
+        <i class="fa-solid fa-shapes w-4 text-center"></i>
+        <span>2. Cadenas R & Plegamiento</span>
+      </button>
+      <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5">
+        <i class="fa-solid fa-flask-vial w-4 text-center"></i>
+        <span>3. Cisteína & Tirosina</span>
+      </button>
+      <button onclick="switchTab(4)" id="tab-btn-4" class="tab-btn text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5">
+        <i class="fa-solid fa-chart-line w-4 text-center"></i>
+        <span>4. Ácido-Base & Zwitterion</span>
+      </button>
+      <button onclick="switchTab(5)" id="tab-btn-5" class="tab-btn text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5">
+        <i class="fa-solid fa-apple-whole w-4 text-center"></i>
+        <span>5. Nutrición & Dietética</span>
+      </button>
+    </nav>
+
+    <!-- Área Dinámica de Contenido de los Módulos -->
+    <div class="flex-1 w-full min-w-0 space-y-6">
+
+    <!-- ========================================== -->
+    <!-- MÓDULO 1: ARQUITECTURA MOLECULAR & QUIRALIDAD -->
+    <!-- ========================================== -->
+    <section id="module-1" class="module-section space-y-6">
+      <!-- Banner Didáctico Vesalio -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-atom"></i> Módulo 1 • Estructura Fundamental y Quiralidad
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Geometría Tetraédrica del Carbono-$\alpha$ y Quiralidad Molecular</h2>
+          <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+            Todos los aminoácidos proteicos son <strong>$\alpha$-aminoácidos</strong>: el grupo amino ($-\text{NH}_2$) y el grupo carboxilo ($-\text{COOH}$) comparten el mismo átomo de carbono central ($\text{C}_\alpha$). Conoce la base geométrica que da origen a la estereoisomería biológica tipo L y la singularidad de la glicina.
+          </p>
+        </div>
+        <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            1
+          </div>
+          <div>
+            <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+            <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid 3D Viewer & Controles -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Visor 3D Interactivo -->
+        <div class="lg:col-span-7 glass-card rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                <i class="fa-solid fa-cube text-accentCyan"></i>
+                Explorador Tridimensional del $\text{C}_\alpha$
+              </h3>
+              <p class="text-xs text-slate-500">Arrastra para rotar la molécula con el ratón o dedo. Geometría tetraédrica ($sp^3$, ángulos $\approx 109.5^\circ$).</p>
+            </div>
+            <button id="btn-reset-cam" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition font-medium flex items-center gap-1">
+              <i class="fa-solid fa-rotate-right"></i> Centrar
+            </button>
+          </div>
+
+          <!-- Canvas 3D Container -->
+          <div class="relative w-full h-[450px] sm:h-[520px] rounded-xl overflow-hidden bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 shadow-inner flex items-center justify-center">
+            <div id="three-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+            
+            <!-- Superposición de Leyendas Químicas -->
+            <div class="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 text-[11px] bg-slate-900/85 backdrop-blur px-3 py-2 rounded-lg border border-slate-700 text-white justify-between">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-400 inline-block"></span> $\text{C}_\alpha$ (Gris)</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Grupo $-\text{NH}_2$ (Azul)</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> Grupo $-\text{COOH}$ (Rojo)</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-white border border-slate-400 inline-block"></span> Hidrógeno $-\text{H}$ (Blanco)</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Cadena $-\text{R}$ (Verde/Var)</span>
+            </div>
+
+            <!-- Overlay Quiralidad Badge -->
+            <div id="chirality-badge" class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur bg-emerald-500/20 text-emerald-300 border-emerald-400/40">
+              <i class="fa-solid fa-fingerprint mr-1"></i> Carbono Asimétrico Quiral (Isómero L)
+            </div>
+          </div>
+
+          <!-- Selector de los 20 Aminoácidos Estándar en el Visor 3D -->
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700">Explorar los 20 Aminoácidos Estándar en 3D:</span>
+              <span class="text-[11px] font-semibold text-accent">20 de 20 disponibles</span>
+            </div>
+
+            <!-- Grupo Alifáticos -->
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Alifáticos Apolares:</span>
+              <div class="flex flex-wrap gap-1">
+                <button onclick="setMolecule('gly')" id="btn-mol-gly" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Glicina (Gly)</button>
+                <button onclick="setMolecule('ala')" id="btn-mol-ala" class="mol-btn px-2 py-1 text-xs rounded-md bg-accent text-white font-medium shadow-sm">Alanina (Ala)</button>
+                <button onclick="setMolecule('val')" id="btn-mol-val" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Valina (Val)</button>
+                <button onclick="setMolecule('leu')" id="btn-mol-leu" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Leucina (Leu)</button>
+                <button onclick="setMolecule('ile')" id="btn-mol-ile" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Isoleucina (Ile)</button>
+                <button onclick="setMolecule('pro')" id="btn-mol-pro" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Prolina (Pro)</button>
+              </div>
+            </div>
+
+            <!-- Grupo Aromáticos -->
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Aromáticos:</span>
+              <div class="flex flex-wrap gap-1">
+                <button onclick="setMolecule('phe')" id="btn-mol-phe" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Fenilalanina (Phe)</button>
+                <button onclick="setMolecule('tyr')" id="btn-mol-tyr" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Tirosina (Tyr)</button>
+                <button onclick="setMolecule('trp')" id="btn-mol-trp" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Triptófano (Trp)</button>
+              </div>
+            </div>
+
+            <!-- Grupo Polares No Cargados & Azufrados -->
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Polares e Hidroxilados / Azufrados:</span>
+              <div class="flex flex-wrap gap-1">
+                <button onclick="setMolecule('ser')" id="btn-mol-ser" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Serina (Ser)</button>
+                <button onclick="setMolecule('thr')" id="btn-mol-thr" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Treonina (Thr)</button>
+                <button onclick="setMolecule('cys')" id="btn-mol-cys" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Cisteína (Cys)</button>
+                <button onclick="setMolecule('met')" id="btn-mol-met" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Metionina (Met)</button>
+                <button onclick="setMolecule('asn')" id="btn-mol-asn" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Asparagina (Asn)</button>
+                <button onclick="setMolecule('gln')" id="btn-mol-gln" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Glutamina (Gln)</button>
+              </div>
+            </div>
+
+            <!-- Grupo Ácidos y Básicos -->
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Cargados (Ácidos $-COO^-$ y Básicos $-NH_3^+$):</span>
+              <div class="flex flex-wrap gap-1">
+                <button onclick="setMolecule('asp')" id="btn-mol-asp" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Aspartato (Asp)</button>
+                <button onclick="setMolecule('glu')" id="btn-mol-glu" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Glutamato (Glu)</button>
+                <button onclick="setMolecule('lys')" id="btn-mol-lys" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Lisina (Lys)</button>
+                <button onclick="setMolecule('arg')" id="btn-mol-arg" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Arginina (Arg)</button>
+                <button onclick="setMolecule('his')" id="btn-mol-his" class="mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">Histidina (His)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anatomía y Demostración de Quiralidad -->
+        <div class="lg:col-span-5 space-y-4">
+          <!-- Card Quiralidad vs Glicina -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-7 h-7 rounded-lg bg-rose-100 text-aminoRed flex items-center justify-center font-bold text-sm">
+                <i class="fa-solid fa-hand"></i>
+              </div>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">Quiralidad y el Caso Singular de la Glicina</h3>
+            </div>
+            
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              Un átomo de carbono es un <strong>centro quiral (asimétrico)</strong> cuando está unido a <strong>cuatro sustituyentes químicamente diferentes</strong>. Esto genera dos imágenes especulares no superponibles denominadas <em>enantiómeros</em> (formas D y L). En los ribosomas humanos se sintetizan exclusivamente proteínas con <strong>L-$\alpha$-aminoácidos</strong>.
+            </p>
+
+            <div id="chirality-explanation" class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 text-xs text-blue-900 space-y-1.5">
+              <div class="font-semibold text-blue-950 flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-check text-accentCyan"></i>
+                <span id="chirality-title">Alanina: 4 sustituyentes distintos</span>
+              </div>
+              <div id="chirality-body" class="text-slate-700">
+                1. $-\text{NH}_2$ | 2. $-\text{COOH}$ | 3. $-\text{H}$ | 4. $-\text{CH}_3$<br>
+                Posee actividad óptica y centro estereogénico.
+              </div>
+            </div>
+
+            <!-- Botón Comparador Glicina Interactivo -->
+            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500">¿Por qué la Glicina es aquiral?</span>
+              <button onclick="toggleGlycineCompare()" class="text-xs px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 hover:bg-amber-100 font-bold transition flex items-center gap-1.5">
+                <i class="fa-solid fa-code-compare"></i> Comparar en vivo
+              </button>
+            </div>
+          </div>
+
+          <!-- Eje Funcional de las Proteínas -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-7 h-7 rounded-lg bg-blue-100 text-brandBlue flex items-center justify-center font-bold text-sm">
+                <i class="fa-solid fa-microscope"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-800 text-sm">Eje Funcional: Del Griego <em>Proteios</em></h3>
+                <span class="text-[11px] text-slate-500">"De primera importancia" o "primordial"</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs mt-3">
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-accentCyan transition cursor-pointer" onclick="showFunctionDetail('catalitica')">
+                <div class="font-bold text-slate-800 flex items-center gap-1.5 text-accentCyan">
+                  <i class="fa-solid fa-bolt"></i> Catalítica
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Enzimas (Hexoquinasa, Pepsina). Aceleran $10^6$ veces.</div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-accentCyan transition cursor-pointer" onclick="showFunctionDetail('estructural')">
+                <div class="font-bold text-slate-800 flex items-center gap-1.5 text-emerald-600">
+                  <i class="fa-solid fa-cubes-stacked"></i> Estructural
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Colágeno dérmico, queratina ungueal y capilar.</div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-accentCyan transition cursor-pointer" onclick="showFunctionDetail('transporte')">
+                <div class="font-bold text-slate-800 flex items-center gap-1.5 text-rose-600">
+                  <i class="fa-solid fa-truck-droplet"></i> Transporte
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Hemoglobina ($O_2$), albúmina sérica (ácidos grasos).</div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-accentCyan transition cursor-pointer" onclick="showFunctionDetail('inmune')">
+                <div class="font-bold text-slate-800 flex items-center gap-1.5 text-purple-600">
+                  <i class="fa-solid fa-shield-virus"></i> Defensa
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Inmunoglobulinas (IgG, IgA) con puentes disulfuro.</div>
+              </div>
+            </div>
+
+            <!-- Detalle emergente de función médica -->
+            <div id="func-detail-box" class="mt-3 p-3 rounded-xl bg-slate-900 text-white text-xs hidden animate-fadeIn">
+              <span id="func-detail-text">Selecciona una función biológica para leer el enfoque médico.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MÓDULO 2: CLASIFICACIÓN DE AMINOÁCIDOS & PLEGAMIENTO -->
+    <!-- ========================================== -->
+    <section id="module-2" class="module-section space-y-6 hidden">
+      <!-- Banner Didáctico Vesalio -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-shapes"></i> Módulo 2 • Familias de Cadenas R & Plegamiento
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Taxonomía de las Cadenas Laterales ($-R$) y el Efecto Hidrofóbico</h2>
+          <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+            El esqueleto $-\text{NH}-\text{C}_\alpha\text{H}-\text{CO}-$ es constante en los 20 aminoácidos; la <strong>identidad química, reactividad y comportamiento biofísico</strong> dependen exclusivamente del grupo $-\text{R}$. Explora las 7 familias y observa cómo el agua celular obliga a las proteínas globulares a plegarse escondiendo sus núcleos hidrofóbicos.
+          </p>
+        </div>
+        <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            2
+          </div>
+          <div>
+            <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+            <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Explorador Taxonómico de Grupos R -->
+        <div class="lg:col-span-6 glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-accentCyan"></i>
+              <span>Las 7 Familias Químicas de Cadenas Laterales ($-R$)</span>
+            </h3>
+            <span class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg shrink-0 w-fit">Selecciona para inspeccionar</span>
+          </div>
+
+          <!-- Selector de Categorías -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
+            <button onclick="renderCategory('alifaticos')" class="cat-pill active-cat px-3 py-2 rounded-xl text-left border transition font-medium bg-cyan-600 text-white border-cyan-600" id="btn-cat-alifaticos">
+              <div class="font-bold">Alifáticos</div>
+              <div class="text-[10px] opacity-80">Apolares (Gly, Ala, Val, Leu, Ile)</div>
+            </button>
+            <button onclick="renderCategory('hidroxilados')" class="cat-pill px-3 py-2 rounded-xl text-left border transition font-medium bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200" id="btn-cat-hidroxilados">
+              <div class="font-bold">Hidroxilados</div>
+              <div class="text-[10px] opacity-80">$-OH$ (Ser, Thr)</div>
+            </button>
+            <button onclick="renderCategory('aromaticos')" class="cat-pill px-3 py-2 rounded-xl text-left border transition font-medium bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200" id="btn-cat-aromaticos">
+              <div class="font-bold">Aromáticos</div>
+              <div class="text-[10px] opacity-80">Anillos (Phe, Tyr, Trp)</div>
+            </button>
+            <button onclick="renderCategory('azufrados')" class="cat-pill px-3 py-2 rounded-xl text-left border transition font-medium bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200" id="btn-cat-azufrados">
+              <div class="font-bold">Azufrados</div>
+              <div class="text-[10px] opacity-80">Con $S$ (Met, Cys)</div>
+            </button>
+            <button onclick="renderCategory('acidos')" class="cat-pill px-3 py-2 rounded-xl text-left border transition font-medium bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200" id="btn-cat-acidos">
+              <div class="font-bold">Ácidos (Dicarboxílicos)</div>
+              <div class="text-[10px] opacity-80">$-COO^-$ (Asp, Glu)</div>
+            </button>
+            <button onclick="renderCategory('basicos')" class="cat-pill px-3 py-2 rounded-xl text-left border transition font-medium bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200" id="btn-cat-basicos">
+              <div class="font-bold">Básicos</div>
+              <div class="text-[10px] opacity-80">Carga $+$ (Lys, Arg, His)</div>
+            </button>
+          </div>
+
+          <!-- Botón Especial Prolina -->
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200/80 flex items-center justify-between cursor-pointer hover:bg-amber-100/70 transition" onclick="renderCategory('prolina')">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs">
+                Pro
+              </div>
+              <div>
+                <h4 class="font-bold text-xs text-amber-950">Caso Singular: Prolina (Iminoácido)</h4>
+                <p class="text-[11px] text-amber-800">Anillo pirrolidínico rígido que cicla sobre el grupo amino central.</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-amber-700"><i class="fa-solid fa-chevron-right"></i></span>
+          </div>
+
+          <!-- Contenedor de Detalle Dinámico de Categoría -->
+          <div id="category-detail-panel" class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <!-- Dynamically populated via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Simulador Biofísico de Plegamiento Globular & Efecto Hidrofóbico -->
+        <div class="lg:col-span-6 glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                <i class="fa-solid fa-droplet text-blue-500"></i>
+                Simulador del Efecto Hidrofóbico y Solubilidad
+              </h3>
+              <p class="text-xs text-slate-500">Mecanismo biofísico impulsado por el aumento de entropía del agua circundante ($\Delta S_{\text{agua}} > 0$).</p>
+            </div>
+          </div>
+
+          <!-- Canvas 2D de Plegamiento -->
+          <div class="relative w-full h-80 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center overflow-hidden">
+            <canvas id="foldingCanvas" width="480" height="320" class="w-full h-full block"></canvas>
+            
+            <div class="absolute top-3 left-3 bg-slate-900/90 text-white px-2.5 py-1 rounded text-xs border border-slate-700 flex items-center gap-2">
+              <span id="folding-state-label" class="font-bold text-amber-400">Cadena Polipeptídica Desnaturalizada</span>
+            </div>
+          </div>
+
+          <!-- Controles del Plegamiento -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="flex items-center gap-1 text-slate-600"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Hidrofóbicos (Núcleo)</span>
+              <span class="flex items-center gap-1 text-slate-600"><span class="w-3 h-3 rounded-full bg-cyan-400 inline-block"></span> Polares/Cargados (Superficie)</span>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="triggerFolding(false)" class="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+                <i class="fa-solid fa-arrows-left-right-to-line"></i> Desnaturalizar
+              </button>
+              <button onclick="triggerFolding(true)" class="text-xs px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow">
+                <i class="fa-solid fa-shield-halved"></i> Plegar en Núcleo Acuoso
+              </button>
+            </div>
+          </div>
+
+          <!-- Explicación Fisiológica Médica -->
+          <div class="p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs text-slate-700 leading-relaxed space-y-1">
+            <div class="font-bold text-blue-950 flex items-center gap-1.5">
+              <i class="fa-solid fa-stethoscope text-accentCyan"></i>
+              Importancia Médica: Amiloidosis y Desnaturalización
+            </div>
+            <p>
+              Cuando un residuo hidrofóbico (como Valina o Leucina) queda anómalamente expuesto en la superficie exterior (ejemplo: mutación de la hemoglobina en <em>Anemia Drepanocítica</em> donde Glu6 pasa a Val6), las moléculas se auto-agregan formando polímeros patológicos insolubles.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MÓDULO 3: CASOS DE ESTUDIO (CISTEÍNA & TIROSINA) -->
+    <!-- ========================================== -->
+    <section id="module-3" class="module-section space-y-6 hidden">
+      <!-- Banner Didáctico Vesalio -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-flask-vial"></i> Módulo 3 • Casos Bioquímicos: Cisteína y Tirosina
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Estudio Especial: Cisteína (Puentes Disulfuro) y Tirosina (Catecolaminas)</h2>
+          <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+            Analizamos en profundidad dos aminoácidos de altísimo impacto fisiopatológico: la capacidad redox de la <strong>Cisteína</strong> para actuar como "cemento molecular" covalentemente estable, y el papel de la <strong>Tirosina</strong> como punto de partida biosintético para la neurotransmisión y la respuesta sistémica al estrés.
+          </p>
+        </div>
+        <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            3
+          </div>
+          <div>
+            <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+            <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Caso 1: Cisteína y Puentes Disulfuro -->
+        <div class="lg:col-span-6 glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
+              <i class="fa-solid fa-link"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-base">Cisteína y la Reacción Redox del Enlace Disulfuro</h3>
+              <p class="text-xs text-slate-500">De tioles libres ($-SH$) al puente covalente cistina ($-S-S-$)</p>
+            </div>
+          </div>
+
+          <!-- Ecuación Formal en KaTeX -->
+          <div class="p-3 bg-slate-900 text-white rounded-xl text-center shadow-inner overflow-x-auto">
+            <div id="equation-redox">$$2\,\text{Cisteína (Tioles: }-\text{SH}) \;\underset{\text{Reducción}}{\overset{\text{Oxidación}}{\rightleftharpoons}}\; \text{Cistina (Puente: }-\text{S}-\text{S}-) + 2\,\text{H}^+ + 2\,\text{e}^-$$</div>
+          </div>
+
+          <!-- Simulador Interactivo Redox del Puente -->
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col items-center text-center space-y-3">
+            <div class="text-xs font-bold text-slate-700">Estado Redox de la Cisteína:</div>
+            
+            <div class="flex items-center justify-center gap-4 py-2">
+              <div id="cys1-visual" class="p-3 rounded-xl bg-white border-2 border-amber-400 shadow-sm">
+                <span class="text-xs font-bold text-slate-800">Cisteína 1</span>
+                <div id="thiol-1" class="text-xs font-mono font-bold text-emerald-600 mt-1">$-\text{CH}_2-\text{SH}$</div>
+              </div>
+
+              <!-- Conexión interactiva -->
+              <div id="bridge-link" class="w-16 h-1 bg-slate-300 relative flex items-center justify-center">
+                <span id="bridge-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">Separados</span>
+              </div>
+
+              <div id="cys2-visual" class="p-3 rounded-xl bg-white border-2 border-amber-400 shadow-sm">
+                <span class="text-xs font-bold text-slate-800">Cisteína 2</span>
+                <div id="thiol-2" class="text-xs font-mono font-bold text-emerald-600 mt-1">$-\text{CH}_2-\text{SH}$</div>
+              </div>
+            </div>
+
+            <!-- Botones de Acción Redox -->
+            <div class="flex gap-2">
+              <button onclick="toggleDisulfide(true)" class="text-xs px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold transition shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-fire"></i> Oxidación (+ Agente Oxidante)
+              </button>
+              <button onclick="toggleDisulfide(false)" class="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-shield"></i> Reducción (+ Agente Reductor)
+              </button>
+            </div>
+          </div>
+
+          <!-- Dos Contextos Médicos Fundamentales -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-slate-700">
+              <div class="font-bold text-blue-900 flex items-center gap-1 mb-1">
+                <i class="fa-solid fa-shield-halved text-accentCyan"></i> Citosol vs. Medio Extracelular
+              </div>
+              El interior celular es rico en glutatión ($\text{GSH}$), manteniendo un <strong>ambiente reductor</strong> (tioles libres). En las proteínas extracelulares (insulina, anticuerpos) el medio oxidante consolida los puentes $-S-S-$.
+            </div>
+
+            <div class="p-3 rounded-xl bg-purple-50 border border-purple-200 text-slate-700">
+              <div class="font-bold text-purple-900 flex items-center gap-1 mb-1">
+                <i class="fa-solid fa-scissors text-purple-600"></i> Permanente Capilar (Queratina)
+              </div>
+              Se usa tioglicolato (reductor) para romper los enlaces $-S-S-$ de la queratina, se deforma mecánicamente el cabello y luego se añade peróxido de hidrógeno (oxidante) para fijar la nueva curvatura.
+            </div>
+          </div>
+        </div>
+
+        <!-- Caso 2: Tirosina y Eje de Catecolaminas -->
+        <div class="lg:col-span-6 glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-100 text-brandBlue flex items-center justify-center font-bold text-sm">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-base">Tirosina: Precursor de Catecolaminas</h3>
+              <p class="text-xs text-slate-500">De Fenilalanina dietética a las hormonas de la médula adrenal</p>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-600 leading-relaxed">
+            La <strong>Tirosina</strong> ($\text{Tyr}$, $Y$) se origina a partir del aminoácido esencial <em>Fenilalanina</em> por acción de la <em>Fenilalanina hidroxilasa</em> (cuyo déficit genético causa <strong>Fenilcetonuria o PKU</strong>). La tirosina es el punto de partida para sintetizar neurotransmisores clave.
+          </p>
+
+          <!-- Cascada Metabólica Interactiva Paso a Paso -->
+          <div class="space-y-2" id="catecholamine-stepper">
+            
+            <!-- Paso 1 -->
+            <div onclick="selectPathwayStep(1)" id="step-1" class="step-card p-3 rounded-xl border-2 border-accentCyan bg-cyan-50/70 cursor-pointer transition">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">1. L-Tirosina</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-200 text-cyan-900">Aminoácido</span>
+              </div>
+              <div class="text-[11px] text-slate-600 mt-1">Anillo aromático fenólico con grupo $-OH$ en posición <em>para</em>.</div>
+            </div>
+
+            <!-- Flecha con Enzima -->
+            <div class="flex items-center justify-center text-xs text-slate-400 font-mono">
+              <i class="fa-solid fa-arrow-down mr-1"></i> <span class="italic text-[11px] text-slate-500">Tirosina Hidroxilasa ($+\text{O}_2, \text{BH}_4$)</span>
+            </div>
+
+            <!-- Paso 2 -->
+            <div onclick="selectPathwayStep(2)" id="step-2" class="step-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">2. L-DOPA (Dihidroxifenilalanina)</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">Intermediario</span>
+              </div>
+              <div class="text-[11px] text-slate-600 mt-1">Sustrato clave administrado en el tratamiento de la <em>Enfermedad de Parkinson</em>.</div>
+            </div>
+
+            <!-- Flecha con Enzima -->
+            <div class="flex items-center justify-center text-xs text-slate-400 font-mono">
+              <i class="fa-solid fa-arrow-down mr-1"></i> <span class="italic text-[11px] text-slate-500">DOPA Descarboxilasa ($-\text{CO}_2, \text{PLP}$)</span>
+            </div>
+
+            <!-- Paso 3 -->
+            <div onclick="selectPathwayStep(3)" id="step-3" class="step-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">3. Dopamina</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Neurotransmisor Central</span>
+              </div>
+              <div class="text-[11px] text-slate-600 mt-1">Regula la motricidad fina en los núcleos de la base y el circuito de recompensa límbico.</div>
+            </div>
+
+            <!-- Flecha con Enzima -->
+            <div class="flex items-center justify-center text-xs text-slate-400 font-mono">
+              <i class="fa-solid fa-arrow-down mr-1"></i> <span class="italic text-[11px] text-slate-500">Dopamina $\beta$-Hidroxilasa</span>
+            </div>
+
+            <!-- Paso 4 -->
+            <div onclick="selectPathwayStep(4)" id="step-4" class="step-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">4. Noradrenalina (Norepinefrina)</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">SNA Simpático</span>
+              </div>
+              <div class="text-[11px] text-slate-600 mt-1">Mantiene el tono vascular periférico y la presión arterial media.</div>
+            </div>
+
+            <!-- Flecha con Enzima -->
+            <div class="flex items-center justify-center text-xs text-slate-400 font-mono">
+              <i class="fa-solid fa-arrow-down mr-1"></i> <span class="italic text-[11px] text-slate-500">Feniletanolamina N-metiltransferasa (PNMT - Adrenal)</span>
+            </div>
+
+            <!-- Paso 5 -->
+            <div onclick="selectPathwayStep(5)" id="step-5" class="step-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">5. Adrenalina (Epinefrina)</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800">Hormona de Estrés</span>
+              </div>
+              <div class="text-[11px] text-slate-600 mt-1">Respuesta clásica "lucha o huida" (taquicardia, broncodilatación, glucogenólisis).</div>
+            </div>
+
+          </div>
+
+          <!-- Cuadro de Explicación Dinámica -->
+          <div id="pathway-desc-box" class="p-3 bg-slate-900 text-white rounded-xl text-xs space-y-1">
+            <span class="font-bold text-cyan-300">Detalle Clínico de la Etapa:</span>
+            <p id="pathway-desc-text" class="text-slate-300">Haz clic en cualquiera de los pasos anteriores para profundizar en su fisiología y farmacología.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MÓDULO 4: ÁCIDO-BASE, ZWITTERION & ELECTROFORESIS -->
+    <!-- ========================================== -->
+    <section id="module-4" class="module-section space-y-6 hidden">
+      <!-- Banner Didáctico Vesalio -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-chart-line"></i> Módulo 4 • Comportamiento Anfótero y Electroforesis
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Propiedades Ácido-Base, Estado Zwitteriónico y Electroforesis</h2>
+          <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+            Los aminoácidos son <strong>electrolitos anfóteros</strong>: pueden ceder o captar protones según el $\text{pH}$ del solvente. Manipula el deslizador continuo para observar la transición desde el catión totalmente protonado hasta el anión desprotonado, atravesando la especie dipolar neutra (<strong>Zwitterion</strong>) en su Punto Isoeléctrico ($pI$).
+          </p>
+        </div>
+        <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            4
+          </div>
+          <div>
+            <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+            <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Simulador de Titulación y Carga Neta -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-accentCyan"></i>
+                <span>Simulador Dinámico de pH y Titulación (Alanina)</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Constantes estándar: $pK_1(-\text{COOH}) = 2.34$, $pK_2(-\text{NH}_3^+) = 9.69$</p>
+            </div>
+            
+            <!-- Carga Neta Badge -->
+            <div id="net-charge-display" class="px-3 py-1.5 rounded-xl font-mono font-bold text-xs sm:text-sm bg-emerald-100 text-emerald-900 border border-emerald-300 shrink-0 w-fit">
+              Carga Neta: <span id="charge-val">0.00</span>
+            </div>
+          </div>
+
+          <!-- Slider de pH Continuo de 0 a 14 -->
+          <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div class="flex items-center justify-between">
+              <label for="ph-slider" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-vial text-accentCyan"></i> $\text{pH}$ de la Solución Acuosa:
+              </label>
+              <span id="ph-label-val" class="font-mono text-xl font-black text-brandBlue px-3 py-0.5 rounded-lg bg-white border border-slate-300 shadow-sm">7.40</span>
+            </div>
+
+            <input id="ph-slider" type="range" min="0" max="14" step="0.1" value="7.4" class="w-full h-2.5 bg-gradient-to-r from-rose-500 via-emerald-400 to-indigo-600 rounded-lg appearance-none cursor-pointer accent-brandBlue">
+            
+            <div class="flex justify-between text-[11px] text-slate-500 font-mono pt-1">
+              <span>0 (Ácido extremo)</span>
+              <span class="text-emerald-700 font-bold">$pI = 6.01$</span>
+              <span class="text-slate-800 font-bold">7.4 (Fisiológico)</span>
+              <span>14 (Básico extremo)</span>
+            </div>
+
+            <!-- Botones Rápidos de pH Médico -->
+            <div class="flex flex-wrap gap-1.5 pt-2">
+              <span class="text-[11px] text-slate-500 mr-1 self-center">Fijar $\text{pH}$:</span>
+              <button onclick="setQuickPh(1.0)" class="text-[11px] px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 font-semibold transition">Estómago ($\text{pH } 1.0$)</button>
+              <button onclick="setQuickPh(2.34)" class="text-[11px] px-2 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold transition">$pK_1$ ($2.34$)</button>
+              <button onclick="setQuickPh(6.01)" class="text-[11px] px-2 py-1 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold transition">Punto Isoeléctrico ($6.01$)</button>
+              <button onclick="setQuickPh(7.4)" class="text-[11px] px-2 py-1 rounded bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition">Plasma ($\text{pH } 7.4$)</button>
+              <button onclick="setQuickPh(9.69)" class="text-[11px] px-2 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold transition">$pK_2$ ($9.69$)</button>
+              <button onclick="setQuickPh(13.0)" class="text-[11px] px-2 py-1 rounded bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-semibold transition">Básico ($\text{pH } 13.0$)</button>
+            </div>
+          </div>
+
+          <!-- Visualización Química de los Grupos Funcionales -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+            
+            <!-- Grupo Amino -->
+            <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-200">
+              <div class="text-[11px] font-bold text-blue-900 mb-1">Grupo Amino ($\alpha$)</div>
+              <div id="disp-amino-formula" class="text-sm font-mono font-bold text-blue-700">$$-\text{NH}_3^+$$</div>
+              <div id="disp-amino-desc" class="text-[11px] text-slate-500 mt-1">Protonado ($+1$)</div>
+            </div>
+
+            <!-- Carbono Alfa y R -->
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="text-[11px] font-bold text-slate-700 mb-1">Esqueleto Central</div>
+              <div class="text-sm font-mono font-bold text-slate-800">$$\text{H}-\text{C}_\alpha-\text{CH}_3$$</div>
+              <div class="text-[11px] text-slate-500 mt-1">Alanina (R neutro)</div>
+            </div>
+
+            <!-- Grupo Carboxilo -->
+            <div class="p-3 rounded-xl bg-rose-50/70 border border-rose-200">
+              <div class="text-[11px] font-bold text-rose-900 mb-1">Grupo Carboxilo ($\alpha$)</div>
+              <div id="disp-carboxyl-formula" class="text-sm font-mono font-bold text-rose-700">$$-\text{COO}^-$$</div>
+              <div id="disp-carboxyl-desc" class="text-[11px] text-slate-500 mt-1">Desprotonado ($-1$)</div>
+            </div>
+
+          </div>
+
+          <!-- Fórmula de Henderson-Hasselbalch y Cálculo de pI -->
+          <div class="p-4 rounded-xl bg-slate-900 text-white space-y-2 text-xs">
+            <div class="font-bold text-cyan-300 flex items-center justify-between">
+              <span>Ecuación de Henderson-Hasselbalch & Punto Isoeléctrico ($pI$)</span>
+              <span class="text-[10px] text-slate-400">Biofísica de Soluciones</span>
+            </div>
+            <div class="text-center py-1">
+              $$\text{pH} = pK_a + \log\left(\frac{[\text{Base Conjugada}]}{[\text{Ácido}]}\right) \qquad\Longrightarrow\qquad pI = \frac{pK_1 + pK_2}{2} = \frac{2.34 + 9.69}{2} = 6.015$$
+            </div>
+            <p class="text-slate-300 text-[11px] leading-relaxed">
+              En el <strong>Punto Isoeléctrico ($pI$)</strong>, el $100\%$ de las moléculas de alanina adoptan la configuración dipolar <strong>Zwitteriónica</strong>. La solubilidad en agua disminuye significativamente al no haber repulsión electrostática neta.
+            </p>
+          </div>
+        </div>
+
+        <!-- Laboratorio de Electroforesis en Gel / Buffer -->
+        <div class="lg:col-span-5 glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div class="border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+              <i class="fa-solid fa-bolt-lightning text-amber-500"></i>
+              <span>Cámara de Electroforesis en Tiempo Real</span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Migración en campo eléctrico continuo según la carga neta</p>
+          </div>
+
+          <!-- Contenedor Visual de la Cámara Electroforética -->
+          <div class="relative w-full h-64 rounded-xl bg-slate-950 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner">
+            
+            <!-- Polos Eléctricos -->
+            <div class="flex justify-between items-center text-xs font-bold font-mono px-2">
+              <span class="text-rose-400 bg-rose-950/70 px-2.5 py-1 rounded border border-rose-800 flex items-center gap-1">
+                <i class="fa-solid fa-circle-minus"></i> CÁTODO ($-$)
+              </span>
+              <span class="text-xs text-slate-400">Cubeta con Buffer $\text{pH}$ <span id="gel-ph-display">7.4</span></span>
+              <span class="text-blue-400 bg-blue-950/70 px-2.5 py-1 rounded border border-blue-800 flex items-center gap-1">
+                ÁNODO ($+$) <i class="fa-solid fa-circle-plus"></i>
+              </span>
+            </div>
+
+            <!-- Gel & Moléculas en Movimiento -->
+            <div class="relative w-full h-32 my-auto bg-slate-900/90 rounded-lg border border-slate-800 overflow-hidden flex items-center justify-center">
+              <!-- Línea de siembra o pocillo original -->
+              <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-dashed border-l border-slate-700 flex flex-col justify-start">
+                <span class="text-[9px] text-slate-500 -ml-8 bg-slate-900 px-1 rounded">Siembra (0)</span>
+              </div>
+
+              <!-- Partículas de Alanina simuladas -->
+              <div id="electrophoresis-runner" class="absolute transition-all duration-700 ease-out flex flex-col items-center" style="left: calc(50% - 24px);">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-lg border border-cyan-300">
+                  <span id="runner-tag">Ala</span>
+                </div>
+                <span id="runner-charge-tag" class="text-[10px] font-mono font-bold mt-1 px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700">0.00</span>
+              </div>
+            </div>
+
+            <!-- Estado de Migración Textual -->
+            <div class="bg-slate-900/80 rounded-lg p-2 text-center text-xs text-slate-300 border border-slate-800">
+              <span class="font-bold text-white">Comportamiento:</span> <span id="migration-status-text" class="text-amber-300">Inmóvil en Punto Isoeléctrico (Zwitterion neutro)</span>
+            </div>
+          </div>
+
+          <!-- Regla Mnemotécnica del Ingreso UCCuyo -->
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-950 space-y-1">
+            <div class="font-bold flex items-center gap-1.5 text-amber-900">
+              <i class="fa-solid fa-lightbulb"></i> Mnemotecnia de Electroforesis Médica:
+            </div>
+            <ul class="list-disc list-inside space-y-0.5 text-slate-700 text-[11px]">
+              <li>Si $\text{pH} < pI \implies$ El aminoácido se carga <strong>positivamente</strong> (Catión) $\to$ Migra al <strong>Cátodo</strong> (negativo).</li>
+              <li>Si $\text{pH} > pI \implies$ El aminoácido se carga <strong>negativamente</strong> (Anión) $\to$ Migra al <strong>Ánodo</strong> (positivo).</li>
+              <li>Si $\text{pH} = pI \implies$ <strong>Zwitterion sin carga neta</strong> $\to$ No migra.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MÓDULO 5: NUTRICIÓN, ESENCIALES & COMPLEMENTACIÓN -->
+    <!-- ========================================== -->
+    <section id="module-5" class="module-section space-y-6 hidden">
+      <!-- Banner Didáctico Vesalio -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-apple-whole"></i> Módulo 5 • Nutrición y Complementación Dietética
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Aminoácidos Esenciales vs. No Esenciales y Complementación Dietética</h2>
+          <p class="text-slate-600 text-sm mt-1 max-w-3xl">
+            El cuerpo humano no puede sintetizar <strong>$8\text{--}9$ aminoácidos esenciales</strong> debido a la ausencia de rutas enzimáticas complejas (como la síntesis del anillo aromático o la ramificación alifática). Comprende el <em>Valor Biológico</em> de los alimentos y utiliza el simulador interactivo de complementación vegetal para prevenir estados de malnutrición proteica (como el síndrome de Kwashiorkor).
+          </p>
+        </div>
+        <div class="p-3 bg-accent-light rounded-xl border border-accent/20 text-xs shrink-0 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            5
+          </div>
+          <div>
+            <span class="font-bold text-slate-800 block text-xs">Unidad Temática VI</span>
+            <span class="text-slate-500 text-[11px]">Curso de Ingreso a Medicina</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Taxonomía Nutricional: Esenciales vs No Esenciales -->
+        <div class="lg:col-span-5 glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <i class="fa-solid fa-list-ol text-accentCyan"></i>
+              Capacidad Biosintética del Organismo
+            </h3>
+            <span class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold">20 Estándar</span>
+          </div>
+
+          <!-- Pestañas de Grupo Nutricional -->
+          <div class="flex gap-2">
+            <button onclick="toggleNutriTab('esenciales')" id="btn-nutri-esenciales" class="flex-1 py-2 text-xs rounded-xl font-bold transition bg-rose-600 text-white shadow-sm">
+              Esenciales ($9$)
+            </button>
+            <button onclick="toggleNutriTab('no-esenciales')" id="btn-nutri-noesenciales" class="flex-1 py-2 text-xs rounded-xl font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200">
+              No Esenciales ($11$)
+            </button>
+          </div>
+
+          <!-- Lista Interactiva de Aminoácidos -->
+          <div id="nutri-list-container" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Mnemotecnia Clásica de Medicina -->
+          <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs space-y-1">
+            <span class="font-bold text-rose-950 flex items-center gap-1">
+              <i class="fa-solid fa-graduation-cap"></i> Mnemotecnia Clave para el Ingreso:
+            </span>
+            <p class="text-rose-900 font-mono text-[11px]">
+              <strong>"VALI-MET-TREO LIS-LEU-ISO FENI-TRIP"</strong> (+ Histidina en lactantes)
+            </p>
+            <p class="text-slate-600 text-[11px]">
+              Valina, Metionina, Treonina, Lisina, Leucina, Isoleucina, Fenilalanina, Triptófano.
+            </p>
+          </div>
+        </div>
+
+        <!-- Simulador de Complementación Proteica Vegetal -->
+        <div class="lg:col-span-7 glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                <i class="fa-solid fa-plate-wheat text-bioGold"></i>
+                <span>Simulador Clínico de Complementación Dietética</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Diseño de platos de alto Valor Biológico combinando aminoácidos limitantes</p>
+            </div>
+            <button onclick="resetDietSimulator()" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition shrink-0 w-fit">
+              Reiniciar
+            </button>
+          </div>
+
+          <!-- Selector de Alimentos Base -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            
+            <button onclick="toggleFoodItem('legumbres')" id="food-btn-legumbres" class="food-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition flex flex-col items-center text-center">
+              <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg mb-2">
+                <i class="fa-solid fa-seedling"></i>
+              </div>
+              <span class="font-bold text-slate-800">Legumbres</span>
+              <span class="text-[10px] text-slate-500">Lentejas, Garbanzos</span>
+              <span class="text-[9px] font-bold text-rose-600 mt-1">Déficit: Metionina</span>
+            </button>
+
+            <button onclick="toggleFoodItem('cereales')" id="food-btn-cereales" class="food-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition flex flex-col items-center text-center">
+              <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-lg mb-2">
+                <i class="fa-solid fa-wheat-awn"></i>
+              </div>
+              <span class="font-bold text-slate-800">Cereales</span>
+              <span class="text-[10px] text-slate-500">Arroz, Avena, Trigo</span>
+              <span class="text-[9px] font-bold text-rose-600 mt-1">Déficit: Lisina</span>
+            </button>
+
+            <button onclick="toggleFoodItem('frutos')" id="food-btn-frutos" class="food-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition flex flex-col items-center text-center">
+              <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-lg mb-2">
+                <i class="fa-solid fa-cookie"></i>
+              </div>
+              <span class="font-bold text-slate-800">Frutos Secos</span>
+              <span class="text-[10px] text-slate-500">Nueces, Almendras</span>
+              <span class="text-[9px] font-bold text-rose-600 mt-1">Déficit: Lisina/Treonina</span>
+            </button>
+
+            <button onclick="toggleFoodItem('huevo')" id="food-btn-huevo" class="food-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition flex flex-col items-center text-center">
+              <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-lg mb-2">
+                <i class="fa-solid fa-egg"></i>
+              </div>
+              <span class="font-bold text-slate-800">Huevo / Carne</span>
+              <span class="text-[10px] text-slate-500">Proteína Animal</span>
+              <span class="text-[9px] font-bold text-emerald-600 mt-1">Perfil Completo ($100\%$)</span>
+            </button>
+
+          </div>
+
+          <!-- Barra de Valor Biológico y Aminograma Resultante -->
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700">Puntaje de Valor Biológico (VB) del Plato:</span>
+              <span id="vb-score-text" class="text-sm font-black font-mono text-slate-500">0% (Plato Vacío)</span>
+            </div>
+
+            <div class="w-full h-3 rounded-full bg-slate-200 overflow-hidden">
+              <div id="vb-progress-bar" class="h-full bg-slate-400 transition-all duration-500" style="width: 0%;"></div>
+            </div>
+
+            <!-- Aminograma de Aminoácidos Críticos -->
+            <div class="grid grid-cols-2 gap-3 pt-2 text-xs">
+              <div class="p-2.5 rounded-lg bg-white border border-slate-200">
+                <div class="flex justify-between font-bold text-slate-700">
+                  <span>Lisina ($\text{Lys}$)</span>
+                  <span id="lys-level" class="text-rose-600">0%</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-100 mt-1.5 overflow-hidden">
+                  <div id="lys-bar" class="h-full bg-rose-500 transition-all duration-300" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-white border border-slate-200">
+                <div class="flex justify-between font-bold text-slate-700">
+                  <span>Metionina ($\text{Met}$)</span>
+                  <span id="met-level" class="text-rose-600">0%</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-100 mt-1.5 overflow-hidden">
+                  <div id="met-bar" class="h-full bg-rose-500 transition-all duration-300" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dictamen Nutricional Clínico -->
+          <div id="diet-clinical-verdict" class="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex items-start gap-2.5">
+            <i class="fa-solid fa-circle-info text-slate-400 mt-0.5"></i>
+            <div>
+              <span class="font-bold text-slate-800">Evaluación del Plato:</span>
+              <p id="diet-verdict-text" class="text-slate-600 mt-0.5">Selecciona alimentos arriba para evaluar la sinergia de aminoácidos limitantes (ej: Arroz + Lentejas).</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    </div>
+  </main>
+
+  <!-- Modal Tutorial / Guía de Uso -->
+  <div id="tutorial-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2 text-accent font-bold text-lg">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Guía de Uso del Simulador • Bioquímica Médica</span>
+        </div>
+        <button onclick="closeTutorial()" class="text-gray-400 hover:text-gray-600 transition text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm text-gray-600 leading-relaxed">
+        <p>
+          Bienvenido al <strong>Laboratorio Interactivo de Bioquímica y Biofísica Médica</strong> para el Curso de Ingreso a Medicina (UCCuyo). Este entorno modela la arquitectura molecular, comportamiento ácido-base, estabilidad redox y nutrición proteica de los $\alpha$-aminoácidos.
+        </p>
+
+        <div class="space-y-3">
+          <!-- Módulo 1 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-atom"></i> 1. Arquitectura Molecular y Quiralidad
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Visor 3D Tetraédrico Completo:</strong> Explora la geometría tridimensional ($sp^3$, $\approx 109.5^\circ$) del carbono alfa ($\text{C}_\alpha$) con sus 4 enlaces: $-\text{H}$, $-\text{COOH}$, $-\text{NH}_2$ y $-\text{R}$.</li>
+              <li><strong>Catálogo Interactivo de los 20 Aminoácidos:</strong> Alterna en tiempo real entre los 20 aminoácidos estándar del organismo humano clasificados por familias (alifáticos, aromáticos, polares no cargados, azufrados, ácidos dicarboxílicos y básicos nitrogenados).</li>
+              <li><strong>Quiralidad vs. Glicina:</strong> Compara la estereoquímica óptica de 19 aminoácidos quirales (configuración L universal en proteínas humanas) frente al caso particular de la Glicina ($\text{R} = -\text{H}$), la cual cuenta con dos hidrógenos idénticos y un plano de simetría especular (aquiral).</li>
+              <li><strong>Eje Funcional:</strong> Revisa el rol biológico primordial (*proteios*) en catálisis enzimática, sostén estructural, transporte de gases y defensa humoral.</li>
+            </ul>
+          </div>
+
+          <!-- Módulo 2 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-shapes"></i> 2. Cadenas Laterales ($-R$) y Plegamiento Globular
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Taxonomía de Familias:</strong> Explora los aminoácidos alifáticos, hidroxilados (sitios de fosforilación), aromáticos (absorción UV a $280\,\text{nm}$), azufrados, ácidos, básicos y el iminoácido Prolina.</li>
+              <li><strong>Simulador de Plegamiento en Canvas:</strong> Activa el plegamiento en medio acuoso para visualizar cómo el <em>efecto hidrofóbico</em> compacta los residuos apolares en el núcleo interno y expone los polares hacia el exterior soluble.</li>
+            </ul>
+          </div>
+
+          <!-- Módulo 3 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-flask-vial"></i> 3. Cisteína Redox y Tirosina (Eje Catecolaminas)
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Puente Disulfuro Redox:</strong> Experimenta con agentes oxidantes y reductores en la transición reversible $2\,\text{Cisteína} \rightleftharpoons \text{Cistina} + 2\,\text{H}^+ + 2\,\text{e}^-$.</li>
+              <li><strong>Eje Biosintético de Catecolaminas:</strong> Recorre la cascada metabólica desde la Tirosina dietética hasta la Adrenalina pasando por L-DOPA, Dopamina y Noradrenalina.</li>
+            </ul>
+          </div>
+
+          <!-- Módulo 4 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-chart-line"></i> 4. Propiedades Ácido-Base, Zwitterion y Electroforesis
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Curva de Titulación Dinámica:</strong> Desplaza el control continuo de $\text{pH}$ ($0$ a $14$) o pulsa los preajustes biomédicos (estómago $\text{pH } 1.0$, $pK_1 = 2.34$, $pI = 6.01$, plasma $\text{pH } 7.4$, $pK_2 = 9.69$ y medio básico $\text{pH } 13.0$).</li>
+              <li><strong>Henderson-Hasselbalch y Carga Neta:</strong> Observa la transición del catión totalmente protonado ($+1$) a la especie dipolar neutra o <strong>Zwitterion</strong> ($0$) en el $pI$, hasta el anión desprotonado ($-1$).</li>
+              <li><strong>Cámara de Electroforesis en Tiempo Real:</strong> Modela la migración electroforética en gel según la carga neta: atracción hacia el cátodo ($-$) cuando $\text{pH} < pI$ (catión), hacia el ánodo ($+$) cuando $\text{pH} > pI$ (anión), o inmovilidad en el punto isoeléctrico ($pI$).</li>
+            </ul>
+          </div>
+
+          <!-- Módulo 5 -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-gray-200 space-y-1.5">
+            <div class="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-2 text-accent">
+              <i class="fa-solid fa-apple-whole"></i> 5. Nutrición, Esenciales y Complementación Dietética
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-xs text-gray-700 ml-1">
+              <li><strong>Capacidad Biosintética:</strong> Contrasta los 9 aminoácidos esenciales con los 11 no esenciales sintetizables a partir de intermediarios del ciclo de Krebs y glucólisis, guiado por la mnemotecnia médica (*VALI-MET-TREO LIS-LEU-ISO FENI-TRIP*).</li>
+              <li><strong>Ley del Mínimo de Liebig y Valor Biológico (VB):</strong> Diseña platos combinando alimentos para evaluar el aminograma de Lisina y Metionina. Comprueba cómo la complementación vegetal (legumbres + cereales) alcanza un $\text{VB} \approx 95\%$, equiparable a la proteína de origen animal.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 space-y-1.5">
+          <h4 class="font-bold flex items-center gap-1.5 text-xs sm:text-sm">
+            <i class="fa-solid fa-lightbulb"></i>
+            Recomendaciones para el Examen de Ingreso UCCuyo
+          </h4>
+          <p class="text-xs leading-relaxed">
+            Ten siempre presente que la Glicina es el único aminoácido sin carbono quiral, que a $\text{pH}$ fisiológico ($7.4$) los aminoácidos neutros predominan como Zwitterion dipolar, y que la migración electroforética está determinada por el signo de la carga neta respecto al $pI$.
+          </p>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-gray-100 flex justify-end">
+        <button onclick="closeTutorial()" class="px-5 py-2.5 bg-accent text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-accent-hover transition shadow-sm">
+          Entendido, comenzar exploración
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pie de Página Institucional Obligatorio -->
+  <footer class="bg-white border-t border-gray-200 py-4 mt-8 text-center text-xs text-gray-500">
+    Desarrollado por vesalio - Todos los derechos reservados
+  </footer>
+
+  <!-- Modal / Notification System (No alert) -->
+  <div id="toast-modal" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3 text-xs max-w-sm">
+      <div id="toast-icon" class="text-accentCyan text-base"><i class="fa-solid fa-circle-check"></i></div>
+      <div id="toast-message" class="text-slate-200">Mensaje informativo</div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT LOGIC: 3D THREE.JS, BIOFÍSICA, REDOX & NUTRICIÓN -->
+  <!-- ======================================================== -->
+  <script>
+    // Global State
+    let currentTab = 1;
+    let threeScene, threeCamera, threeRenderer;
+    let molGroup;
+    let isGlycine = false;
+    let currentMoleculeType = 'ala';
+
+    // State for Simulation 2: Protein Folding
+    let foldingCanvas, foldingCtx;
+    let foldingProgress = 0; // 0 = linear denatured, 1 = folded globular
+    let targetFolding = 0;
+    let foldingParticles = [];
+
+    // State for Module 5: Diet Simulator
+    let selectedFoods = {
+      legumbres: false,
+      cereales: false,
+      frutos: false,
+      huevo: false
+    };
+
+    // ==========================================
+    // INITIALIZATION ON WINDOW LOAD
+    // ==========================================
+    window.onload = function() {
+      // 1. Render KaTeX formulas across DOM
+      renderMath();
+
+      // 2. Initialize 3D Engine for Module 1
+      initThreeD();
+
+      // 3. Initialize Module 2 2D Folding Canvas
+      initFoldingCanvas();
+
+      // 4. Initialize Module 2 Category Panel
+      renderCategory('alifaticos');
+
+      // 5. Initialize Module 4 pH Titration Listener
+      initPhSlider();
+
+      // 6. Initialize Module 5 Nutritional List
+      toggleNutriTab('esenciales');
+
+      // Loop for Canvas Animations
+      requestAnimationFrame(mainAnimationLoop);
+    };
+
+    // Helper: Trigger KaTeX Auto-Render
+    function renderMath() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Toast Notification replacement for alert()
+    function showNotification(message, iconClass = 'fa-solid fa-circle-info') {
+      const modal = document.getElementById('toast-modal');
+      const msgEl = document.getElementById('toast-message');
+      const iconEl = document.getElementById('toast-icon');
+      
+      msgEl.innerText = message;
+      iconEl.innerHTML = `<i class="${iconClass}"></i>`;
+      
+      modal.classList.remove('translate-y-20', 'opacity-0');
+      modal.classList.add('translate-y-0', 'opacity-100');
+      
+      setTimeout(() => {
+        modal.classList.add('translate-y-20', 'opacity-0');
+        modal.classList.remove('translate-y-0', 'opacity-100');
+      }, 3200);
+    }
+
+    // Funciones del Modal Tutorial (Guía de Uso)
+    function openTutorial() {
+      const m = document.getElementById('tutorial-modal');
+      if (m) m.classList.remove('hidden');
+    }
+
+    function closeTutorial() {
+      const m = document.getElementById('tutorial-modal');
+      if (m) m.classList.add('hidden');
+    }
+
+    // ==========================================
+    // TAB NAVIGATION LOGIC (Sidebar Oficial Vesalio)
+    // ==========================================
+    function switchTab(tabNumber) {
+      currentTab = tabNumber;
+      
+      // Update Tab Buttons
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById(`tab-btn-${i}`);
+        const sec = document.getElementById(`module-${i}`);
+        if (!btn || !sec) continue;
+
+        if (i === tabNumber) {
+          btn.className = 'tab-btn bg-accent text-white flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition shadow-sm flex items-center gap-2.5';
+          sec.classList.remove('hidden');
+        } else {
+          btn.className = 'tab-btn text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-2.5';
+          sec.classList.add('hidden');
+        }
+      }
+
+      // Re-render math inside active tab
+      setTimeout(() => {
+        renderMath();
+        if (tabNumber === 1 && threeRenderer) {
+          onWindowResize();
+        }
+      }, 50);
+    }
+
+    // ==========================================
+    // MODULE 1: THREE.JS 3D MOLECULAR VIEWER
+    // ==========================================
+    function initThreeD() {
+      const container = document.getElementById('three-container');
+      if (!container) return;
+
+      const width = container.clientWidth || 400;
+      const height = container.clientHeight || 340;
+
+      // Scene, Camera, Renderer
+      threeScene = new THREE.Scene();
+      threeCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      threeCamera.position.set(0, 0.5, 6.2);
+
+      threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      threeRenderer.setSize(width, height);
+      threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(threeRenderer.domElement);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      threeScene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+      dirLight.position.set(5, 10, 7);
+      threeScene.add(dirLight);
+
+      const backLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
+      backLight.position.set(-5, -5, -5);
+      threeScene.add(backLight);
+
+      // Molecule Group
+      molGroup = new THREE.Group();
+      threeScene.add(molGroup);
+
+      // Build Molecule Geometry
+      buildMolecule('ala');
+
+      // Mouse drag rotation controls
+      let isDragging = false;
+      let prevMousePos = { x: 0, y: 0 };
+
+      const onMouseDown = (e) => {
+        isDragging = true;
+        prevMousePos = { x: e.clientX || (e.touches && e.touches[0].clientX), y: e.clientY || (e.touches && e.touches[0].clientY) };
+      };
+
+      const onMouseMove = (e) => {
+        if (!isDragging) return;
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        const deltaX = clientX - prevMousePos.x;
+        const deltaY = clientY - prevMousePos.y;
+
+        molGroup.rotation.y += deltaX * 0.01;
+        molGroup.rotation.x += deltaY * 0.01;
+
+        prevMousePos = { x: clientX, y: clientY };
+      };
+
+      const onMouseUp = () => { isDragging = false; };
+
+      container.addEventListener('mousedown', onMouseDown);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+
+      container.addEventListener('touchstart', onMouseDown, { passive: true });
+      window.addEventListener('touchmove', onMouseMove, { passive: true });
+      window.addEventListener('touchend', onMouseUp);
+
+      // Reset camera button
+      document.getElementById('btn-reset-cam').addEventListener('click', () => {
+        molGroup.rotation.set(0, 0, 0);
+        threeCamera.position.set(0, 0.5, 6.2);
+      });
+
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('three-container');
+      if (!container || !threeRenderer || !threeCamera) return;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      threeCamera.aspect = width / height;
+      threeCamera.updateProjectionMatrix();
+      threeRenderer.setSize(width, height);
+    }
+
+    // Helper: Create Sphere with Bond
+    function createAtom(color, radius, position) {
+      const geometry = new THREE.SphereGeometry(radius, 32, 32);
+      const material = new THREE.MeshStandardMaterial({
+        color: color,
+        roughness: 0.3,
+        metalness: 0.2
+      });
+      const atom = new THREE.Mesh(geometry, material);
+      atom.position.copy(position);
+      return atom;
+    }
+
+    function createBond(pos1, pos2, radius = 0.08) {
+      const direction = new THREE.Vector3().subVectors(pos2, pos1);
+      const length = direction.length();
+      const geom = new THREE.CylinderGeometry(radius, radius, length, 16);
+      const mat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.5 });
+      const cylinder = new THREE.Mesh(geom, mat);
+
+      cylinder.position.copy(new THREE.Vector3().addVectors(pos1, pos2).multiplyScalar(0.5));
+      cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
+      return cylinder;
+    }
+
+    function buildMolecule(type) {
+      currentMoleculeType = type;
+      // Clear previous
+      while (molGroup.children.length > 0) {
+        molGroup.remove(molGroup.children[0]);
+      }
+
+      // Positions in Tetrahedral Geometry (~109.5 deg)
+      const pC_alpha = new THREE.Vector3(0, 0, 0);
+      const pN = new THREE.Vector3(-1.2, 0.6, 0.4);       // Amino
+      const pCarboxyl = new THREE.Vector3(1.3, 0.5, -0.3); // Carboxyl
+      const pH = new THREE.Vector3(-0.1, -1.2, -0.6);      // Hydrogen
+      const pR = new THREE.Vector3(0.2, 0.3, 1.4);         // Side chain R
+
+      // 1. Central Carbon (Gray)
+      molGroup.add(createAtom(0x64748b, 0.38, pC_alpha));
+
+      // 2. Amino Group (Nitrogen Blue + 2 H's)
+      molGroup.add(createBond(pC_alpha, pN));
+      molGroup.add(createAtom(0x2563eb, 0.34, pN));
+      const pNH1 = new THREE.Vector3(-1.8, 1.1, 0.8);
+      const pNH2 = new THREE.Vector3(-1.4, 0.3, -0.5);
+      molGroup.add(createBond(pN, pNH1, 0.04));
+      molGroup.add(createAtom(0xffffff, 0.18, pNH1));
+      molGroup.add(createBond(pN, pNH2, 0.04));
+      molGroup.add(createAtom(0xffffff, 0.18, pNH2));
+
+      // 3. Carboxyl Group (Carbon + Carbonyl Oxygen + Hydroxyl Oxygen)
+      molGroup.add(createBond(pC_alpha, pCarboxyl));
+      molGroup.add(createAtom(0x475569, 0.3, pCarboxyl));
+      const pO_double = new THREE.Vector3(2.0, 1.2, -0.1);
+      const pO_single = new THREE.Vector3(1.7, -0.4, -0.9);
+      molGroup.add(createBond(pCarboxyl, pO_double, 0.07));
+      molGroup.add(createAtom(0xe11d48, 0.28, pO_double));
+      molGroup.add(createBond(pCarboxyl, pO_single, 0.07));
+      molGroup.add(createAtom(0xbe123c, 0.28, pO_single));
+
+      // 4. Central Hydrogen (White)
+      molGroup.add(createBond(pC_alpha, pH));
+      molGroup.add(createAtom(0xf8fafc, 0.22, pH));
+
+      // 5. Variable Side Chain -R (Emerald / Yellow for S / Blue for N / Red for O)
+      molGroup.add(createBond(pC_alpha, pR));
+      
+      if (type === 'gly') {
+        // 1. Glycine: R is another Hydrogen (Aquiral!)
+        molGroup.add(createAtom(0xf8fafc, 0.22, pR));
+        isGlycine = true;
+      } else if (type === 'ala') {
+        // 2. Alanine: Methyl -CH3
+        molGroup.add(createAtom(0x10b981, 0.34, pR));
+        const pH_r1 = new THREE.Vector3(0.5, 0.9, 1.8);
+        const pH_r2 = new THREE.Vector3(-0.4, -0.1, 2.0);
+        molGroup.add(createBond(pR, pH_r1, 0.04));
+        molGroup.add(createAtom(0xffffff, 0.16, pH_r1));
+        molGroup.add(createBond(pR, pH_r2, 0.04));
+        molGroup.add(createAtom(0xffffff, 0.16, pH_r2));
+        isGlycine = false;
+      } else if (type === 'val') {
+        // 3. Valine: -CH(CH3)2
+        molGroup.add(createAtom(0x10b981, 0.32, pR));
+        const pC1 = new THREE.Vector3(0.8, 1.0, 1.9);
+        const pC2 = new THREE.Vector3(-0.5, -0.2, 2.2);
+        molGroup.add(createBond(pR, pC1, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pC1));
+        molGroup.add(createBond(pR, pC2, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pC2));
+        isGlycine = false;
+      } else if (type === 'leu') {
+        // 4. Leucine: -CH2-CH(CH3)2
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pCg = new THREE.Vector3(0.4, 0.8, 2.2);
+        const pCd1 = new THREE.Vector3(1.2, 1.3, 2.5);
+        const pCd2 = new THREE.Vector3(-0.3, 0.7, 3.0);
+        molGroup.add(createBond(pR, pCg, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pCg));
+        molGroup.add(createBond(pCg, pCd1, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCd1));
+        molGroup.add(createBond(pCg, pCd2, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCd2));
+        isGlycine = false;
+      } else if (type === 'ile') {
+        // 5. Isoleucine: -CH(CH3)-CH2-CH3
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pCg2 = new THREE.Vector3(-0.5, 0.1, 2.1); // Methyl
+        const pCg1 = new THREE.Vector3(0.6, 1.0, 2.1);  // CH2
+        const pCd1 = new THREE.Vector3(0.8, 1.7, 2.8);  // CH3
+        molGroup.add(createBond(pR, pCg2, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCg2));
+        molGroup.add(createBond(pR, pCg1, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pCg1));
+        molGroup.add(createBond(pCg1, pCd1, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCd1));
+        isGlycine = false;
+      } else if (type === 'pro') {
+        // 6. Proline: Pyrrolidine ring cycling back to N
+        molGroup.add(createAtom(0x10b981, 0.28, pR)); // C_beta
+        const pCg = new THREE.Vector3(-0.6, 0.6, 1.8); // C_gamma
+        const pCd = new THREE.Vector3(-1.2, 0.9, 1.2); // C_delta
+        molGroup.add(createBond(pR, pCg, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pCg));
+        molGroup.add(createBond(pCg, pCd, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pCd));
+        molGroup.add(createBond(pCd, pN, 0.06)); // Closes onto N
+        isGlycine = false;
+      } else if (type === 'phe') {
+        // 7. Phenylalanine: -CH2-Phenyl ring
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const ringCenter = new THREE.Vector3(0.5, 0.7, 2.5);
+        for (let a = 0; a < 6; a++) {
+          const ang = (a / 6) * Math.PI * 2;
+          const pos = new THREE.Vector3(
+            ringCenter.x + Math.cos(ang) * 0.7,
+            ringCenter.y + Math.sin(ang) * 0.7,
+            ringCenter.z
+          );
+          molGroup.add(createAtom(0x0284c7, 0.20, pos));
+          if (a === 0) molGroup.add(createBond(pR, pos, 0.05));
+          const nextAng = ((a + 1) / 6) * Math.PI * 2;
+          const nextPos = new THREE.Vector3(
+            ringCenter.x + Math.cos(nextAng) * 0.7,
+            ringCenter.y + Math.sin(nextAng) * 0.7,
+            ringCenter.z
+          );
+          molGroup.add(createBond(pos, nextPos, 0.04));
+        }
+        isGlycine = false;
+      } else if (type === 'tyr') {
+        // 8. Tyrosine: -CH2-Phenyl-OH
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const ringCenter = new THREE.Vector3(0.5, 0.7, 2.5);
+        let paraPos = null;
+        for (let a = 0; a < 6; a++) {
+          const ang = (a / 6) * Math.PI * 2;
+          const pos = new THREE.Vector3(
+            ringCenter.x + Math.cos(ang) * 0.7,
+            ringCenter.y + Math.sin(ang) * 0.7,
+            ringCenter.z
+          );
+          molGroup.add(createAtom(0x0284c7, 0.20, pos));
+          if (a === 0) molGroup.add(createBond(pR, pos, 0.05));
+          if (a === 3) paraPos = pos;
+          const nextAng = ((a + 1) / 6) * Math.PI * 2;
+          const nextPos = new THREE.Vector3(
+            ringCenter.x + Math.cos(nextAng) * 0.7,
+            ringCenter.y + Math.sin(nextAng) * 0.7,
+            ringCenter.z
+          );
+          molGroup.add(createBond(pos, nextPos, 0.04));
+        }
+        if (paraPos) {
+          const pOH = new THREE.Vector3(paraPos.x - 0.4, paraPos.y, paraPos.z + 0.4);
+          molGroup.add(createBond(paraPos, pOH, 0.05));
+          molGroup.add(createAtom(0xe11d48, 0.24, pOH)); // Phenolic -OH
+        }
+        isGlycine = false;
+      } else if (type === 'trp') {
+        // 9. Tryptophan: -CH2-Indole ring
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pC2 = new THREE.Vector3(0.4, 0.8, 2.3);
+        const pN1 = new THREE.Vector3(-0.2, 1.2, 2.6);
+        const pC3 = new THREE.Vector3(0.8, 1.4, 2.8);
+        molGroup.add(createBond(pR, pC2, 0.05));
+        molGroup.add(createBond(pC2, pN1, 0.05));
+        molGroup.add(createAtom(0x2563eb, 0.22, pN1)); // Nitrogen in indole
+        molGroup.add(createBond(pC2, pC3, 0.05));
+        molGroup.add(createAtom(0x0284c7, 0.22, pC3));
+        const pRing = new THREE.Vector3(1.4, 1.8, 3.2);
+        molGroup.add(createBond(pC3, pRing, 0.05));
+        molGroup.add(createAtom(0x0284c7, 0.28, pRing));
+        isGlycine = false;
+      } else if (type === 'ser') {
+        // 10. Serine: -CH2-OH
+        molGroup.add(createAtom(0x10b981, 0.32, pR));
+        const pOH = new THREE.Vector3(0.6, 0.5, 2.3);
+        molGroup.add(createBond(pR, pOH, 0.06));
+        molGroup.add(createAtom(0xe11d48, 0.28, pOH)); // Red Oxygen
+        isGlycine = false;
+      } else if (type === 'thr') {
+        // 11. Threonine: -CH(OH)-CH3
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pOH = new THREE.Vector3(0.7, 0.8, 2.1);
+        const pCH3 = new THREE.Vector3(-0.4, 0.2, 2.3);
+        molGroup.add(createBond(pR, pOH, 0.06));
+        molGroup.add(createAtom(0xe11d48, 0.26, pOH));
+        molGroup.add(createBond(pR, pCH3, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCH3));
+        isGlycine = false;
+      } else if (type === 'cys') {
+        // 12. Cysteine: -CH2-SH
+        molGroup.add(createAtom(0x10b981, 0.32, pR));
+        const pSH = new THREE.Vector3(0.6, 0.5, 2.4);
+        molGroup.add(createBond(pR, pSH, 0.06));
+        molGroup.add(createAtom(0xeab308, 0.35, pSH)); // Yellow Sulfur
+        isGlycine = false;
+      } else if (type === 'met') {
+        // 13. Methionine: -CH2-CH2-S-CH3
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pCg = new THREE.Vector3(0.5, 0.7, 2.2);
+        const pS = new THREE.Vector3(0.3, 0.5, 3.0);
+        const pCe = new THREE.Vector3(0.8, 1.1, 3.6);
+        molGroup.add(createBond(pR, pCg, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pCg));
+        molGroup.add(createBond(pCg, pS, 0.06));
+        molGroup.add(createAtom(0xeab308, 0.34, pS)); // Sulfur
+        molGroup.add(createBond(pS, pCe, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCe));
+        isGlycine = false;
+      } else if (type === 'asn') {
+        // 14. Asparagine: -CH2-CONH2
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pCg = new THREE.Vector3(0.5, 0.8, 2.2);
+        const pO = new THREE.Vector3(1.2, 0.8, 2.5);
+        const pN = new THREE.Vector3(0.1, 1.4, 2.6);
+        molGroup.add(createBond(pR, pCg, 0.06));
+        molGroup.add(createAtom(0x475569, 0.28, pCg));
+        molGroup.add(createBond(pCg, pO, 0.06));
+        molGroup.add(createAtom(0xe11d48, 0.26, pO)); // Amide Oxygen
+        molGroup.add(createBond(pCg, pN, 0.06));
+        molGroup.add(createAtom(0x2563eb, 0.26, pN)); // Amide Nitrogen
+        isGlycine = false;
+      } else if (type === 'gln') {
+        // 15. Glutamine: -CH2-CH2-CONH2
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pCg = new THREE.Vector3(0.4, 0.7, 2.1);
+        const pCd = new THREE.Vector3(0.7, 1.2, 2.8);
+        const pO = new THREE.Vector3(1.4, 1.1, 3.1);
+        const pN = new THREE.Vector3(0.2, 1.8, 3.3);
+        molGroup.add(createBond(pR, pCg, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pCg));
+        molGroup.add(createBond(pCg, pCd, 0.06));
+        molGroup.add(createAtom(0x475569, 0.28, pCd));
+        molGroup.add(createBond(pCd, pO, 0.06));
+        molGroup.add(createAtom(0xe11d48, 0.26, pO));
+        molGroup.add(createBond(pCd, pN, 0.06));
+        molGroup.add(createAtom(0x2563eb, 0.26, pN));
+        isGlycine = false;
+      } else if (type === 'asp') {
+        // 16. Aspartate: -CH2-COO(-)
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pCg = new THREE.Vector3(0.5, 0.8, 2.2);
+        const pO1 = new THREE.Vector3(1.2, 0.8, 2.5);
+        const pO2 = new THREE.Vector3(0.1, 1.4, 2.6);
+        molGroup.add(createBond(pR, pCg, 0.06));
+        molGroup.add(createAtom(0x475569, 0.28, pCg));
+        molGroup.add(createBond(pCg, pO1, 0.06));
+        molGroup.add(createAtom(0xe11d48, 0.26, pO1));
+        molGroup.add(createBond(pCg, pO2, 0.06));
+        molGroup.add(createAtom(0xe11d48, 0.26, pO2));
+        isGlycine = false;
+      } else if (type === 'glu') {
+        // 17. Glutamate: -CH2-CH2-COO(-)
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pCg = new THREE.Vector3(0.4, 0.7, 2.1);
+        const pCd = new THREE.Vector3(0.7, 1.2, 2.8);
+        const pO1 = new THREE.Vector3(1.4, 1.1, 3.1);
+        const pO2 = new THREE.Vector3(0.2, 1.8, 3.3);
+        molGroup.add(createBond(pR, pCg, 0.06));
+        molGroup.add(createAtom(0x10b981, 0.28, pCg));
+        molGroup.add(createBond(pCg, pCd, 0.06));
+        molGroup.add(createAtom(0x475569, 0.28, pCd));
+        molGroup.add(createBond(pCd, pO1, 0.06));
+        molGroup.add(createAtom(0xe11d48, 0.26, pO1));
+        molGroup.add(createBond(pCd, pO2, 0.06));
+        molGroup.add(createAtom(0xe11d48, 0.26, pO2));
+        isGlycine = false;
+      } else if (type === 'lys') {
+        // 18. Lysine: -(CH2)4-NH3(+)
+        molGroup.add(createAtom(0x10b981, 0.28, pR));
+        const pCg = new THREE.Vector3(0.4, 0.6, 2.1);
+        const pCd = new THREE.Vector3(0.2, 1.1, 2.7);
+        const pCe = new THREE.Vector3(0.6, 1.4, 3.3);
+        const pNz = new THREE.Vector3(0.3, 2.0, 3.9);
+        molGroup.add(createBond(pR, pCg, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCg));
+        molGroup.add(createBond(pCg, pCd, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCd));
+        molGroup.add(createBond(pCd, pCe, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCe));
+        molGroup.add(createBond(pCe, pNz, 0.06));
+        molGroup.add(createAtom(0x2563eb, 0.30, pNz)); // Terminal -NH3+
+        isGlycine = false;
+      } else if (type === 'arg') {
+        // 19. Arginine: -(CH2)3-NH-C(=NH2+)-NH2 (Guanidino)
+        molGroup.add(createAtom(0x10b981, 0.28, pR));
+        const pCg = new THREE.Vector3(0.4, 0.6, 2.1);
+        const pCd = new THREE.Vector3(0.2, 1.1, 2.7);
+        const pNe = new THREE.Vector3(0.6, 1.4, 3.3);
+        const pCz = new THREE.Vector3(0.3, 2.0, 3.8);
+        const pNh1 = new THREE.Vector3(0.8, 2.4, 4.3);
+        const pNh2 = new THREE.Vector3(-0.4, 2.2, 4.1);
+        molGroup.add(createBond(pR, pCg, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCg));
+        molGroup.add(createBond(pCg, pCd, 0.05));
+        molGroup.add(createAtom(0x10b981, 0.26, pCd));
+        molGroup.add(createBond(pCd, pNe, 0.05));
+        molGroup.add(createAtom(0x2563eb, 0.26, pNe));
+        molGroup.add(createBond(pNe, pCz, 0.05));
+        molGroup.add(createAtom(0x475569, 0.26, pCz));
+        molGroup.add(createBond(pCz, pNh1, 0.05));
+        molGroup.add(createAtom(0x2563eb, 0.26, pNh1));
+        molGroup.add(createBond(pCz, pNh2, 0.05));
+        molGroup.add(createAtom(0x2563eb, 0.26, pNh2));
+        isGlycine = false;
+      } else if (type === 'his') {
+        // 20. Histidine: -CH2-Imidazole ring
+        molGroup.add(createAtom(0x10b981, 0.30, pR));
+        const pCg = new THREE.Vector3(0.4, 0.7, 2.2);
+        const pNd1 = new THREE.Vector3(-0.2, 1.1, 2.5);
+        const pCd2 = new THREE.Vector3(0.9, 1.2, 2.6);
+        const pCe1 = new THREE.Vector3(0.0, 1.8, 3.0);
+        const pNe2 = new THREE.Vector3(0.7, 1.9, 3.1);
+        molGroup.add(createBond(pR, pCg, 0.05));
+        molGroup.add(createAtom(0x475569, 0.24, pCg));
+        molGroup.add(createBond(pCg, pNd1, 0.05));
+        molGroup.add(createAtom(0x2563eb, 0.24, pNd1));
+        molGroup.add(createBond(pCg, pCd2, 0.05));
+        molGroup.add(createAtom(0x475569, 0.24, pCd2));
+        molGroup.add(createBond(pNd1, pCe1, 0.05));
+        molGroup.add(createAtom(0x475569, 0.24, pCe1));
+        molGroup.add(createBond(pCd2, pNe2, 0.05));
+        molGroup.add(createAtom(0x2563eb, 0.24, pNe2));
+        molGroup.add(createBond(pCe1, pNe2, 0.05));
+        isGlycine = false;
+      }
+
+      updateChiralityUI();
+    }
+
+    function setMolecule(type) {
+      document.querySelectorAll('.mol-btn').forEach(btn => {
+        btn.className = 'mol-btn px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition';
+      });
+      const activeBtn = document.getElementById(`btn-mol-${type}`);
+      if (activeBtn) {
+        activeBtn.className = 'mol-btn px-2 py-1 text-xs rounded-md bg-accent text-white font-medium shadow-sm';
+      }
+      buildMolecule(type);
+    }
+
+    const aaDescriptions = {
+      gly: { name: 'Glicina (Gly, G)', r: '$-H$', type: 'Alifático aquiral' },
+      ala: { name: 'Alanina (Ala, A)', r: '$-CH_3$', type: 'Alifático apolar' },
+      val: { name: 'Valina (Val, V)', r: '$-CH(CH_3)_2$', type: 'Alifático ramificado esencial' },
+      leu: { name: 'Leucina (Leu, L)', r: '$-CH_2-CH(CH_3)_2$', type: 'Alifático ramificado esencial' },
+      ile: { name: 'Isoleucina (Ile, I)', r: '$-CH(CH_3)-CH_2-CH_3$', type: 'Alifático ramificado esencial (2 C quirales)' },
+      pro: { name: 'Prolina (Pro, P)', r: 'Anillo pirrolidínico rígido', type: 'Iminoácido conformacional' },
+      phe: { name: 'Fenilalanina (Phe, F)', r: '$-CH_2-C_6H_5$', type: 'Aromático apolar esencial' },
+      tyr: { name: 'Tirosina (Tyr, Y)', r: '$-CH_2-C_6H_4-OH$', type: 'Aromático con grupo fenólico (-OH)' },
+      trp: { name: 'Triptófano (Trp, W)', r: '$-CH_2-\\text{Indol}$', type: 'Aromático bicíclico esencial' },
+      ser: { name: 'Serina (Ser, S)', r: '$-CH_2-OH$', type: 'Hidroxilado polar no cargado' },
+      thr: { name: 'Treonina (Thr, T)', r: '$-CH(OH)-CH_3$', type: 'Hidroxilado polar esencial (2 C quirales)' },
+      cys: { name: 'Cisteína (Cys, C)', r: '$-CH_2-SH$', type: 'Azufrado con tiol redox' },
+      met: { name: 'Metionina (Met, M)', r: '$-(CH_2)_2-S-CH_3$', type: 'Azufrado apolar tioéter esencial' },
+      asn: { name: 'Asparagina (Asn, N)', r: '$-CH_2-CONH_2$', type: 'Polar con grupo amida' },
+      gln: { name: 'Glutamina (Gln, Q)', r: '$-(CH_2)_2-CONH_2$', type: 'Polar con grupo amida' },
+      asp: { name: 'Aspartato (Asp, D)', r: '$-CH_2-COO^-$', type: 'Ácido dicarboxílico (carga -1 a pH 7.4)' },
+      glu: { name: 'Glutamato (Glu, E)', r: '$-(CH_2)_2-COO^-$', type: 'Ácido dicarboxílico (carga -1 a pH 7.4)' },
+      lys: { name: 'Lisina (Lys, K)', r: '$-(CH_2)_4-NH_3^+$', type: 'Básico nitrogenado esencial (carga +1 a pH 7.4)' },
+      arg: { name: 'Arginina (Arg, R)', r: '$-(CH_2)_3-\\text{Guanidinio}^+$', type: 'Básico fuertemente catiónico (carga +1)' },
+      his: { name: 'Histidina (His, H)', r: '$-CH_2-\\text{Imidazol}$', type: 'Básico amortiguador fisiológico (pK_R ~ 6.0)' }
+    };
+
+    function updateChiralityUI() {
+      const badge = document.getElementById('chirality-badge');
+      const title = document.getElementById('chirality-title');
+      const body = document.getElementById('chirality-body');
+
+      if (isGlycine) {
+        badge.className = 'absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur bg-amber-500/20 text-amber-300 border-amber-400/40';
+        badge.innerHTML = '<i class="fa-solid fa-scale-balanced mr-1"></i> Molécula Aquiral (Plano de Simetría)';
+        
+        title.innerHTML = 'Glicina: 2 sustituyentes idénticos ($-H$)';
+        body.innerHTML = 'Posee dos átomos de hidrógeno unidos al $C_\\alpha$. Al poseer un <strong>plano de simetría especular</strong>, es el único aminoácido estándar que <em>carece de actividad óptica</em> y enantiómeros D/L.';
+      } else {
+        badge.className = 'absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur bg-emerald-500/20 text-emerald-300 border-emerald-400/40';
+        badge.innerHTML = '<i class="fa-solid fa-fingerprint mr-1"></i> Carbono Asimétrico Quiral (Isómero L)';
+
+        const info = aaDescriptions[currentMoleculeType] || { name: currentMoleculeType, r: '-R', type: 'Quiral' };
+        title.innerHTML = `${info.name}: 4 sustituyentes distintos`;
+        body.innerHTML = `1. Grupo amino básico ($-NH_2$)<br>2. Grupo carboxilo ácido ($-COOH$)<br>3. Átomo de hidrógeno ($-H$)<br>4. Cadena lateral: <strong>${info.r}</strong> (${info.type})<br>Configura un <strong>centro estereogénico quiral</strong> con configuración L-estereoquímica universal en mamíferos.`;
+      }
+      renderMath();
+    }
+
+    function toggleGlycineCompare() {
+      if (currentMoleculeType === 'gly') {
+        setMolecule('ala');
+        showNotification('Alternado a Alanina (Quiral, 4 sustituyentes distintos).');
+      } else {
+        setMolecule('gly');
+        showNotification('Alternado a Glicina (Aquiral, 2 hidrógenos idénticos).');
+      }
+    }
+
+    function showFunctionDetail(type) {
+      const box = document.getElementById('func-detail-box');
+      const text = document.getElementById('func-detail-text');
+      box.classList.remove('hidden');
+
+      const data = {
+        catalitica: '<strong>Función Catalítica (Enzimas):</strong> Los grupos $-R$ de aminoácidos como Serina, Histidina y Aspartato forman las <em>tríadas catalíticas</em> en sitios activos. Bajan la energía de activación ($\Delta G^\ddagger$) acelerando reacciones hasta $10^{12}$ veces a temperatura corporal ($37^\circ\\text{C}$).',
+        estructural: '<strong>Función Estructural:</strong> El <em>Colágeno</em> (rica en Glicina y Prolina en triple hélice) resiste tracciones gigantescas en tendones y hueso. La <em>Queratina</em> aporta impermeabilidad y rigidez por puentes disulfuro cruzados.',
+        transporte: '<strong>Función de Transporte:</strong> La <em>Hemoglobina</em> (tetrámero globular con 4 grupos Hemo) transporta $O_2$ desde los capilares alveolares hasta los tejidos periféricos mediante cooperatividad alostérica (efecto Bohr).',
+        inmune: '<strong>Defensa Inmunitaria:</strong> Las <em>Inmunoglobulinas</em> (IgG, IgM) contienen cadenas pesadas y ligeras unidas por puentes disulfuro intercatenarios con regiones hipervariables que reconocen antígenos específicos.'
+      };
+
+      text.innerHTML = data[type];
+      renderMath();
+    }
+
+    // ==========================================
+    // MODULE 2: TAXONOMÍA DE GRUPOS R Y PLEGAMIENTO 2D
+    // ==========================================
+    const categoriesData = {
+      alifaticos: {
+        title: 'Alifáticos Apolares (Hidrofóbicos)',
+        badge: '5 Aminoácidos',
+        members: 'Glicina (Gly), Alanina (Ala), Valina (Val), Leucina (Leu), Isoleucina (Ile)',
+        desc: 'Cadenas hidrocarbonadas lineales o ramificadas. Al ser completamente apolares, no interactúan favorablemente con dipolos de agua. Son las principales responsables del <strong>efecto hidrofóbico</strong>, empaquetándose apretadamente en el interior de las proteínas globulares.',
+        clinical: '<strong>Clínica:</strong> En la <em>Enfermedad de la orina con olor a jarabe de arce</em>, existe un bloqueo congénito en el catabolismo oxidativo de los aminoácidos ramificados (Val, Leu, Ile).'
+      },
+      hidroxilados: {
+        title: 'Hidroxilados Polares No Cargados',
+        badge: 'Serina & Treonina',
+        members: 'Serina (Ser), Treonina (Thr)',
+        desc: 'Presentan un grupo alcohol polar ($-\\text{OH}$) capaz de formar puentes de hidrógeno con el agua y con otros residuos del polipéptido. Son químicamente reactivos.',
+        clinical: '<strong>Clínica:</strong> Constituyen los sitios de <strong>fosforilación reversible</strong> catalizados por quinasas ($-\\text{OH} + \\text{ATP} \\to -\\text{O-PO}_3^{2-} + \\text{ADP}$), el mecanismo de señalización celular más importante en transducción endocrina.'
+      },
+      aromaticos: {
+        title: 'Aromáticos (Absorción UV a 280 nm)',
+        badge: '3 Aminoácidos',
+        members: 'Fenilalanina (Phe), Tirosina (Tyr), Triptófano (Trp)',
+        desc: 'Poseen anillos aromáticos conjugados con electrones deslocalizados. Tienen propiedades espectroscópicas únicas: absorben fuertemente luz ultravioleta a $\\lambda = 280\\,\\text{nm}$, técnica empleada en laboratorios clínicos para cuantificar proteínas.',
+        clinical: '<strong>Clínica:</strong> La Tirosina es precursor de catecolaminas y hormonas tiroideas ($T_3, T_4$). El Triptófano origina la <em>Serotonina</em> y la <em>Melatonina</em>.'
+      },
+      azufrados: {
+        title: 'Azufrados (Incorporación de Átomo de S)',
+        badge: 'Metionina & Cisteína',
+        members: 'Metionina (Met - Apelar), Cisteína (Cys - Tiol Polar)',
+        desc: 'La <strong>Metionina</strong> es apolar y contiene un enlace tioéter ($-\\text{S}-\\text{CH}_3$). La <strong>Cisteína</strong> posee un sulfhidrilo o tiol reactivo ($-\\text{SH}$) capaz de oxidarse para formar puentes disulfuro covalentes.',
+        clinical: '<strong>Clínica:</strong> La Metionina es el primer aminoácido traducido en todos los ribosomas eucariotas (codón de inicio $\\text{AUG}$) y precursor de la S-adenosilmetionina (SAMe), donador de metilos.'
+      },
+      acidos: {
+        title: 'Ácidos Dicarboxílicos (Carga Negativa Neta)',
+        badge: 'Aspartato & Glutamato',
+        members: 'Aspartato (Asp), Glutamato (Glu)',
+        desc: 'Poseen un segundo grupo carboxilo en su cadena lateral ($\\beta$-carboxilo en Asp, $\\gamma$-carboxilo en Glu) con $pK_R \\approx 3.9 - 4.1$. A $\\text{pH}$ fisiológico ($7.4$) se encuentran desprotonados ($-\\text{COO}^-$).',
+        clinical: '<strong>Clínica:</strong> Forman <em>puentes salinos</em> (enlaces iónicos) con residuos básicos. El Glutamato es el neurotransmisor excitatorio primario del sistema nervioso central.'
+      },
+      basicos: {
+        title: 'Básicos (Carga Positiva Neta a pH Fisiológico)',
+        badge: 'Lisina, Arginina & Histidina',
+        members: 'Lisina (Lys), Arginina (Arg), Histidina (His)',
+        desc: 'Cadenas laterales con nitrógenos que aceptan protones. La Lisina tiene un grupo $\\epsilon$-amino ($pK_a \\approx 10.5$). La Arginina posee un grupo guanidinio con resonancia ($pK_a \\approx 12.5$). La Histidina posee un anillo imidazol ($pK_a \\approx 6.0$).',
+        clinical: '<strong>Clínica:</strong> El $pK_a$ de la Histidina ($6.0$) está muy cerca del $\\text{pH}$ celular, por lo que actúa como el principal amortiguador (buffer) proteico fisiológico en la hemoglobina eritrocitaria.'
+      },
+      prolina: {
+        title: 'Prolina: El Iminoácido Conformacionalmente Rígido',
+        badge: 'Caso Singular',
+        members: 'Prolina (Pro)',
+        desc: 'Su cadena lateral alifática de 3 carbonos se cierra covalentemente sobre el grupo amino del esqueleto polipeptídico, formando un <strong>anillo pirrolidínico</strong> secundario (iminoácido). Al no poseer hidrógeno en el nitrógeno cuando forma enlace peptídico, no puede donar puentes de hidrógeno.',
+        clinical: '<strong>Clínica:</strong> Impone un quiebre o doblez obligado ("rompedor de hélices $\\alpha$") y es fundamental para los giros-$\beta$ y la estructura fibrosa del <em>colágeno</em>. En el escorbuto (déficit de vitamina C), falla la hidroxilación de la prolina, debilitando la piel y encías.'
+      }
+    };
+
+    function renderCategory(catKey) {
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.className = 'cat-pill px-3 py-2 rounded-xl text-left border transition font-medium bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200';
+      });
+      const activeBtn = document.getElementById(`btn-cat-${catKey}`);
+      if (activeBtn) {
+        activeBtn.className = 'cat-pill px-3 py-2 rounded-xl text-left border transition font-medium bg-cyan-600 text-white border-cyan-600 shadow';
+      }
+
+      const d = categoriesData[catKey];
+      const panel = document.getElementById('category-detail-panel');
+      panel.innerHTML = `
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm">${d.title}</h4>
+            <span class="text-xs font-semibold text-accentCyan">${d.members}</span>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold">${d.badge}</span>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed">${d.desc}</p>
+        <div class="p-2.5 rounded-lg bg-blue-50/70 border border-blue-200 text-xs text-blue-950">
+          ${d.clinical}
+        </div>
+      `;
+      renderMath();
+    }
+
+    // 2D Folding Simulator Canvas
+    function initFoldingCanvas() {
+      foldingCanvas = document.getElementById('foldingCanvas');
+      if (!foldingCanvas) return;
+      foldingCtx = foldingCanvas.getContext('2d');
+
+      // Create synthetic peptide chain of 24 residues
+      foldingParticles = [];
+      const totalResidues = 26;
+      for (let i = 0; i < totalResidues; i++) {
+        const isHydrophobic = (i % 3 === 0 || i % 5 === 0); // mixed sequence
+        // Linear position
+        const linearX = 35 + (i * ((foldingCanvas.width - 70) / (totalResidues - 1)));
+        const linearY = foldingCanvas.height / 2 + Math.sin(i * 0.8) * 18;
+        
+        // Folded target position (Hydrophobic in core, polar on outer shell)
+        const angle = (i / totalResidues) * Math.PI * 2;
+        const radius = isHydrophobic ? (18 + Math.random() * 25) : (68 + Math.random() * 20);
+        const foldedX = foldingCanvas.width / 2 + Math.cos(angle) * radius;
+        const foldedY = foldingCanvas.height / 2 + Math.sin(angle) * radius;
+
+        foldingParticles.push({
+          isHydrophobic: isHydrophobic,
+          linearX: linearX,
+          linearY: linearY,
+          foldedX: foldedX,
+          foldedY: foldedY,
+          currentX: linearX,
+          currentY: linearY
+        });
+      }
+    }
+
+    function triggerFolding(folded) {
+      targetFolding = folded ? 1 : 0;
+      const label = document.getElementById('folding-state-label');
+      if (folded) {
+        label.innerText = 'Proteína Plegada: Núcleo Hidrofóbico + Envoltura Polar Soluble';
+        label.className = 'font-bold text-emerald-400';
+        showNotification('Efecto hidrofóbico: Residuos apolares compactados en el centro.');
+      } else {
+        label.innerText = 'Cadena Polipeptídica Desnaturalizada (Lineal)';
+        label.className = 'font-bold text-amber-400';
+        showNotification('Desnaturalización: Exposición de residuos apolares al solvente.');
+      }
+    }
+
+    function drawFoldingCanvas() {
+      if (!foldingCtx || !foldingCanvas) return;
+      
+      // Interpolate progress towards target
+      foldingProgress += (targetFolding - foldingProgress) * 0.05;
+
+      foldingCtx.clearRect(0, 0, foldingCanvas.width, foldingCanvas.height);
+
+      // Water Solvent Background Grid / Particles
+      foldingCtx.fillStyle = 'rgba(15, 23, 42, 0.4)';
+      foldingCtx.fillRect(0, 0, foldingCanvas.width, foldingCanvas.height);
+
+      // Draw solvent molecules (H2O subtle dots)
+      foldingCtx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+      for (let x = 20; x < foldingCanvas.width; x += 45) {
+        for (let y = 20; y < foldingCanvas.height; y += 45) {
+          foldingCtx.beginPath();
+          foldingCtx.arc(x + Math.sin(Date.now() * 0.002 + x) * 3, y + Math.cos(Date.now() * 0.002 + y) * 3, 2, 0, Math.PI * 2);
+          foldingCtx.fill();
+        }
+      }
+
+      // Draw backbone bonds
+      foldingCtx.beginPath();
+      foldingCtx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+      foldingCtx.lineWidth = 3;
+
+      for (let i = 0; i < foldingParticles.length; i++) {
+        const p = foldingParticles[i];
+        p.currentX = p.linearX + (p.foldedX - p.linearX) * foldingProgress;
+        p.currentY = p.linearY + (p.foldedY - p.linearY) * foldingProgress;
+
+        if (i === 0) {
+          foldingCtx.moveTo(p.currentX, p.currentY);
+        } else {
+          foldingCtx.lineTo(p.currentX, p.currentY);
+        }
+      }
+      foldingCtx.stroke();
+
+      // Draw core highlight if folded
+      if (foldingProgress > 0.4) {
+        foldingCtx.beginPath();
+        foldingCtx.arc(foldingCanvas.width / 2, foldingCanvas.height / 2, 45 * foldingProgress, 0, Math.PI * 2);
+        foldingCtx.fillStyle = `rgba(245, 158, 11, ${0.12 * foldingProgress})`;
+        foldingCtx.fill();
+        foldingCtx.strokeStyle = `rgba(245, 158, 11, ${0.3 * foldingProgress})`;
+        foldingCtx.setLineDash([4, 4]);
+        foldingCtx.stroke();
+        foldingCtx.setLineDash([]);
+      }
+
+      // Draw residue spheres
+      for (let i = 0; i < foldingParticles.length; i++) {
+        const p = foldingParticles[i];
+        foldingCtx.beginPath();
+        foldingCtx.arc(p.currentX, p.currentY, 6.5, 0, Math.PI * 2);
+        
+        if (p.isHydrophobic) {
+          // Amber/Orange for Hydrophobic
+          foldingCtx.fillStyle = '#f59e0b';
+          foldingCtx.shadowColor = '#d97706';
+          foldingCtx.shadowBlur = 6;
+        } else {
+          // Cyan/Blue for Polar Hydrophilic
+          foldingCtx.fillStyle = '#38bdf8';
+          foldingCtx.shadowColor = '#0284c7';
+          foldingCtx.shadowBlur = 6;
+        }
+        foldingCtx.fill();
+        foldingCtx.shadowBlur = 0;
+
+        foldingCtx.strokeStyle = '#ffffff';
+        foldingCtx.lineWidth = 1;
+        foldingCtx.stroke();
+      }
+    }
+
+    // ==========================================
+    // MODULE 3: CASOS DE ESTUDIO (CISTEÍNA REDOX & TIROSINA)
+    // ==========================================
+    let isDisulfideOxidized = false;
+
+    function toggleDisulfide(oxidize) {
+      isDisulfideOxidized = oxidize;
+      const t1 = document.getElementById('thiol-1');
+      const t2 = document.getElementById('thiol-2');
+      const bridgeBadge = document.getElementById('bridge-badge');
+      const bridgeLink = document.getElementById('bridge-link');
+      const cys1 = document.getElementById('cys1-visual');
+      const cys2 = document.getElementById('cys2-visual');
+
+      if (oxidize) {
+        t1.innerHTML = '$-\\text{CH}_2-\\text{S}-$';
+        t2.innerHTML = '$-\\text{S}-\\text{CH}_2-$';
+        bridgeBadge.innerText = 'Enlace Covalente S-S';
+        bridgeBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white shadow animate-pulse';
+        bridgeLink.className = 'w-16 h-1.5 bg-rose-500 relative flex items-center justify-center';
+        cys1.className = 'p-3 rounded-xl bg-rose-50 border-2 border-rose-500 shadow-md';
+        cys2.className = 'p-3 rounded-xl bg-rose-50 border-2 border-rose-500 shadow-md';
+        showNotification('Oxidación completada: Formación de Cistina con puente -S-S- covalente.', 'fa-solid fa-link');
+      } else {
+        t1.innerHTML = '$-\\text{CH}_2-\\text{SH}$';
+        t2.innerHTML = '$-\\text{CH}_2-\\text{SH}$';
+        bridgeBadge.innerText = 'Separados';
+        bridgeBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600';
+        bridgeLink.className = 'w-16 h-1 bg-slate-300 relative flex items-center justify-center';
+        cys1.className = 'p-3 rounded-xl bg-white border-2 border-amber-400 shadow-sm';
+        cys2.className = 'p-3 rounded-xl bg-white border-2 border-amber-400 shadow-sm';
+        showNotification('Reducción completada: Puentes disulfuro rotos a tioles libres (-SH).', 'fa-solid fa-scissors');
+      }
+      renderMath();
+    }
+
+    const pathwayDetails = {
+      1: '<strong>L-Tirosina:</strong> Aminoácido semiesencial sintetizado a partir de Fenilalanina dietética por la <em>Fenilalanina hidroxilasa</em> hepática con cofactor tetrahidrobiopterina ($\\text{BH}_4$).',
+      2: '<strong>L-DOPA:</strong> Producto de la hidroxilación del anillo por la <em>Tirosina Hidroxilasa</em> (enzima limitante de toda la vía). Traspasa la barrera hematoencefálica y se administra a pacientes con Parkinson para restablecer los niveles dopaminérgicos estriatales.',
+      3: '<strong>Dopamina:</strong> Neurotransmisor catecolaminérgico descarboxilado dependiente de fosfato de piridoxal (vitamina $B_6$). Actúa en receptores $D_1$ y $D_2$. En la periferia modula el flujo renal y la natriuresis.',
+      4: '<strong>Noradrenalina (Norepinefrina):</strong> Neurotransmisor posganglionar simpático sintetizado en vesículas sinápticas. Potente agonista de receptores adrenérgicos $\\alpha_1, \\beta_1$ para elevar la resistencia vascular sistémica.',
+      5: '<strong>Adrenalina (Epinefrina):</strong> Producida en las células cromafines de la médula suprarrenal mediante N-metilación inducida por cortisol. Media la respuesta de huida: vasodilatación muscular, taquicardia y broncodilatación intensa.'
+    };
+
+    function selectPathwayStep(stepNumber) {
+      for (let i = 1; i <= 5; i++) {
+        const card = document.getElementById(`step-${i}`);
+        if (i === stepNumber) {
+          card.className = 'step-card p-3 rounded-xl border-2 border-accentCyan bg-cyan-50/70 cursor-pointer transition shadow-sm';
+        } else {
+          card.className = 'step-card p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition';
+        }
+      }
+      document.getElementById('pathway-desc-text').innerHTML = pathwayDetails[stepNumber];
+      renderMath();
+    }
+
+    // ==========================================
+    // MODULE 4: PROPIEDADES ÁCIDO-BASE, ZWITTERION & ELECTROFORESIS
+    // ==========================================
+    const pK1 = 2.34; // Alanine -COOH
+    const pK2 = 9.69; // Alanine -NH3+
+    const pI = (pK1 + pK2) / 2; // 6.015
+
+    function initPhSlider() {
+      const slider = document.getElementById('ph-slider');
+      slider.addEventListener('input', (e) => {
+        updateAcidBaseState(parseFloat(e.target.value));
+      });
+      updateAcidBaseState(7.4);
+    }
+
+    function setQuickPh(val) {
+      const slider = document.getElementById('ph-slider');
+      slider.value = val;
+      updateAcidBaseState(val);
+    }
+
+    function updateAcidBaseState(ph) {
+      document.getElementById('ph-label-val').innerText = ph.toFixed(2);
+      document.getElementById('gel-ph-display').innerText = ph.toFixed(2);
+
+      // Fraction deprotonated of Carboxyl using Henderson-Hasselbalch
+      // alpha_COOH = 1 / (1 + 10^(pK1 - pH))
+      const alpha_COOH = 1 / (1 + Math.pow(10, pK1 - ph)); // 0 when fully protonated (-COOH), 1 when fully deprotonated (-COO-)
+      
+      // Fraction protonated of Amino
+      // alpha_NH3 = 1 / (1 + 10^(pH - pK2)) // 1 when fully protonated (-NH3+), 0 when fully deprotonated (-NH2)
+      const alpha_NH3 = 1 / (1 + Math.pow(10, ph - pK2));
+
+      // Net Charge = (+1 * alpha_NH3) + (-1 * alpha_COOH)
+      const netCharge = alpha_NH3 - alpha_COOH;
+
+      // Update Net Charge Badge
+      const chargeEl = document.getElementById('charge-val');
+      const chargeDisplay = document.getElementById('net-charge-display');
+      chargeEl.innerText = (netCharge > 0 ? `+${netCharge.toFixed(2)}` : netCharge.toFixed(2));
+
+      if (Math.abs(netCharge) < 0.1) {
+        chargeDisplay.className = 'px-3 py-1.5 rounded-xl font-mono font-bold text-sm bg-emerald-100 text-emerald-900 border border-emerald-300';
+      } else if (netCharge > 0) {
+        chargeDisplay.className = 'px-3 py-1.5 rounded-xl font-mono font-bold text-sm bg-blue-100 text-blue-900 border border-blue-300';
+      } else {
+        chargeDisplay.className = 'px-3 py-1.5 rounded-xl font-mono font-bold text-sm bg-rose-100 text-rose-900 border border-rose-300';
+      }
+
+      // Update Chemical Formula Boxes
+      const aminoFormula = document.getElementById('disp-amino-formula');
+      const aminoDesc = document.getElementById('disp-amino-desc');
+      const carbFormula = document.getElementById('disp-carboxyl-formula');
+      const carbDesc = document.getElementById('disp-carboxyl-desc');
+
+      if (alpha_NH3 > 0.8) {
+        aminoFormula.innerHTML = '$$-\\text{NH}_3^+$$';
+        aminoDesc.innerText = 'Totalmente Protonado (+1)';
+        aminoDesc.className = 'text-[11px] text-blue-600 font-bold mt-1';
+      } else if (alpha_NH3 < 0.2) {
+        aminoFormula.innerHTML = '$$-\\text{NH}_2$$';
+        aminoDesc.innerText = 'Desprotonado Neutro (0)';
+        aminoDesc.className = 'text-[11px] text-slate-500 mt-1';
+      } else {
+        aminoFormula.innerHTML = '$$-\\text{NH}_3^+ \\;\\rightleftharpoons\\; -\\text{NH}_2$$';
+        aminoDesc.innerText = 'Zona Buffer pK2 (50% / 50%)';
+        aminoDesc.className = 'text-[11px] text-amber-600 font-bold mt-1';
+      }
+
+      if (alpha_COOH > 0.8) {
+        carbFormula.innerHTML = '$$-\\text{COO}^-$$';
+        carbDesc.innerText = 'Desprotonado Anión (-1)';
+        carbDesc.className = 'text-[11px] text-rose-600 font-bold mt-1';
+      } else if (alpha_COOH < 0.2) {
+        carbFormula.innerHTML = '$$-\\text{COOH}$$';
+        carbDesc.innerText = 'Protonado Neutro (0)';
+        carbDesc.className = 'text-[11px] text-slate-500 mt-1';
+      } else {
+        carbFormula.innerHTML = '$$-\\text{COOH} \\;\\rightleftharpoons\\; -\\text{COO}^-$$';
+        carbDesc.innerText = 'Zona Buffer pK1 (50% / 50%)';
+        carbDesc.className = 'text-[11px] text-amber-600 font-bold mt-1';
+      }
+
+      // Update Electrophoresis Runner in Real-Time
+      const runner = document.getElementById('electrophoresis-runner');
+      const runnerChargeTag = document.getElementById('runner-charge-tag');
+      const statusText = document.getElementById('migration-status-text');
+
+      runnerChargeTag.innerText = (netCharge > 0 ? `+${netCharge.toFixed(2)}` : netCharge.toFixed(2));
+
+      // Calculate shift from center (50%)
+      // If charge is negative, migrates towards Anode (+), i.e., to the right (>50%)
+      // If charge is positive, migrates towards Cathode (-), i.e., to the left (<50%)
+      const maxOffsetPercent = 38; // Max displacement % from center
+      const displacement = -netCharge * maxOffsetPercent; // netCharge -1 -> +38% (Right to Anode)
+      const leftPos = 50 + displacement;
+
+      runner.style.left = `calc(${leftPos}% - 24px)`;
+
+      if (Math.abs(netCharge) < 0.08) {
+        statusText.innerHTML = '<span class="text-emerald-400 font-bold">Inmóvil en Punto Isoeléctrico (Zwitterion dipolar neutro)</span>';
+        runnerChargeTag.className = 'text-[10px] font-mono font-bold mt-1 px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700';
+      } else if (netCharge > 0) {
+        statusText.innerHTML = `<span class="text-blue-400 font-bold">Catión (+): Migración activa hacia el Cátodo (-)</span>`;
+        runnerChargeTag.className = 'text-[10px] font-mono font-bold mt-1 px-1.5 py-0.5 rounded bg-slate-800 text-blue-400 border border-slate-700';
+      } else {
+        statusText.innerHTML = `<span class="text-rose-400 font-bold">Anión (-): Migración activa hacia el Ánodo (+)</span>`;
+        runnerChargeTag.className = 'text-[10px] font-mono font-bold mt-1 px-1.5 py-0.5 rounded bg-slate-800 text-rose-400 border border-slate-700';
+      }
+
+      renderMath();
+    }
+
+    // ==========================================
+    // MODULE 5: NUTRICIÓN Y COMPLEMENTACIÓN DIETÉTICA
+    // ==========================================
+    const essentialAA = [
+      { name: 'Valina (Val)', limit: 'Ramificado alifático', src: 'Lácteos, carne, soja' },
+      { name: 'Leucina (Leu)', limit: 'Estimulador m-TOR primario', src: 'Legumbres, pescado' },
+      { name: 'Isoleucina (Ile)', limit: 'Isómero ramificado', src: 'Huevos, frutos secos' },
+      { name: 'Metionina (Met)', limit: 'Limitante en legumbres', src: 'Cereales, sésamo' },
+      { name: 'Treonina (Thr)', limit: 'Hidroxilado esencial', src: 'Lácteos, espinaca' },
+      { name: 'Lisina (Lys)', limit: 'Limitante en cereales', src: 'Legumbres, lentejas' },
+      { name: 'Fenilalanina (Phe)', limit: 'Precursor de Tirosina', src: 'Semillas, carnes' },
+      { name: 'Triptófano (Trp)', limit: 'Precursor de Serotonina', src: 'Avena, plátano, huevos' },
+      { name: 'Histidina (His)', limit: 'Esencial en infantes/niños', src: 'Pescado, soja' }
+    ];
+
+    const nonEssentialAA = [
+      { name: 'Alanina (Ala)', origin: 'Transaminación del Piruvato' },
+      { name: 'Glutamato (Glu)', origin: 'Transaminación de $\\alpha$-cetoglutarato' },
+      { name: 'Aspartato (Asp)', origin: 'Transaminación de Oxalacetato' },
+      { name: 'Glutamina (Gln)', origin: 'Fijación de amonio celular ($\text{NH}_4^+$)' },
+      { name: 'Asparagina (Asn)', origin: 'Amidación del aspartato' },
+      { name: 'Prolina (Pro)', origin: 'Ciclación del glutamato' },
+      { name: 'Serina (Ser)', origin: 'Intermediario glucolítico (3-fosfoglicerato)' },
+      { name: 'Glicina (Gly)', origin: 'A partir de serina dietética' },
+      { name: 'Cisteína (Cys)', origin: 'Sulfuro de metionina + esqueleto de serina' },
+      { name: 'Tirosina (Tyr)', origin: 'Hidroxilación de fenilalanina' },
+      { name: 'Arginina (Arg)', origin: 'Ciclo de la Urea hepático' }
+    ];
+
+    function toggleNutriTab(type) {
+      const btnEs = document.getElementById('btn-nutri-esenciales');
+      const btnNoEs = document.getElementById('btn-nutri-noesenciales');
+      const container = document.getElementById('nutri-list-container');
+
+      if (type === 'esenciales') {
+        btnEs.className = 'flex-1 py-2 text-xs rounded-xl font-bold transition bg-rose-600 text-white shadow-sm';
+        btnNoEs.className = 'flex-1 py-2 text-xs rounded-xl font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
+        
+        container.innerHTML = essentialAA.map(aa => `
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between text-xs">
+            <div>
+              <span class="font-bold text-slate-800">${aa.name}</span>
+              <div class="text-[10px] text-slate-500">${aa.src}</div>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold">${aa.limit}</span>
+          </div>
+        `).join('');
+      } else {
+        btnNoEs.className = 'flex-1 py-2 text-xs rounded-xl font-bold transition bg-blue-600 text-white shadow-sm';
+        btnEs.className = 'flex-1 py-2 text-xs rounded-xl font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
+
+        container.innerHTML = nonEssentialAA.map(aa => `
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-800">${aa.name}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">${aa.origin}</span>
+          </div>
+        `).join('');
+      }
+      renderMath();
+    }
+
+    function toggleFoodItem(key) {
+      selectedFoods[key] = !selectedFoods[key];
+      const btn = document.getElementById(`food-btn-${key}`);
+      if (selectedFoods[key]) {
+        btn.classList.add('border-accentCyan', 'bg-cyan-50', 'ring-2', 'ring-accentCyan/30');
+      } else {
+        btn.classList.remove('border-accentCyan', 'bg-cyan-50', 'ring-2', 'ring-accentCyan/30');
+      }
+      calculateDietQuality();
+    }
+
+    function resetDietSimulator() {
+      selectedFoods = { legumbres: false, cereales: false, frutos: false, huevo: false };
+      ['legumbres', 'cereales', 'frutos', 'huevo'].forEach(k => {
+        const btn = document.getElementById(`food-btn-${k}`);
+        btn.classList.remove('border-accentCyan', 'bg-cyan-50', 'ring-2', 'ring-accentCyan/30');
+      });
+      calculateDietQuality();
+      showNotification('Simulador de plato reiniciado.');
+    }
+
+    function calculateDietQuality() {
+      let lys = 0;
+      let met = 0;
+      let score = 0;
+      let verdict = '';
+      let verdictClass = 'text-slate-600';
+
+      if (selectedFoods.huevo) {
+        // High biological value animal protein
+        lys = 100;
+        met = 100;
+        score = 100;
+        verdict = '<strong>Proteína Completa de Alto Valor Biológico (VB = 100%):</strong> Contiene todos los aminoácidos esenciales en las proporciones estequiométricas óptimas para la síntesis de albúmina y masa muscular en humanos.';
+      } else {
+        // Vegetal calculations
+        if (selectedFoods.legumbres) {
+          lys += 85; // Rich in Lysine
+          met += 20; // Limited in Methionine
+        }
+        if (selectedFoods.cereales) {
+          lys += 20; // Limited in Lysine
+          met += 85; // Rich in Methionine
+        }
+        if (selectedFoods.frutos) {
+          lys += 25;
+          met += 40;
+        }
+
+        lys = Math.min(lys, 100);
+        met = Math.min(met, 100);
+
+        // Law of Minimum (Liebig): Total protein biological value is limited by the most deficient amino acid!
+        if (lys === 0 && met === 0) {
+          score = 0;
+          verdict = 'Plato vacío. Selecciona alimentos para analizar su aminograma.';
+        } else {
+          score = Math.round(Math.min(lys, met) * 0.95);
+          
+          if (selectedFoods.legumbres && selectedFoods.cereales) {
+            verdict = '<strong>¡Complementación Proteica Perfecta (VB $\\approx 95\\%$):</strong> La abundancia de Lisina en las legumbres compensa el déficit de los cereales, y la abundancia de Metionina en los cereales compensa a las legumbres. Es la combinación de oro en nutrición vegetariana (ej: Guiso de lentejas con arroz integral).';
+          } else if (selectedFoods.legumbres && !selectedFoods.cereales) {
+            verdict = '<strong>Proteína Incompleta por Aminoácido Limitante:</strong> Las legumbres aportan abundante Lisina, pero la síntesis de nuevas proteínas se detendrá por la escasez crítica de <em>Metionina</em>.';
+          } else if (selectedFoods.cereales && !selectedFoods.legumbres) {
+            verdict = '<strong>Proteína Incompleta por Aminoácido Limitante:</strong> Los cereales aportan abundante Metionina, pero carecen de <em>Lisina</em> suficiente, limitando drásticamente el valor biológico.';
+          } else {
+            verdict = 'Aporte parcial de aminoácidos esenciales. Se recomienda integrar legumbres y cereales juntos en el mismo día.';
+          }
+        }
+      }
+
+      // UI Update
+      document.getElementById('vb-score-text').innerText = `${score}% (Valor Biológico)`;
+      const pBar = document.getElementById('vb-progress-bar');
+      pBar.style.width = `${score}%`;
+
+      if (score >= 85) {
+        pBar.className = 'h-full bg-emerald-500 transition-all duration-500';
+      } else if (score >= 45) {
+        pBar.className = 'h-full bg-amber-500 transition-all duration-500';
+      } else {
+        pBar.className = 'h-full bg-rose-500 transition-all duration-500';
+      }
+
+      document.getElementById('lys-level').innerText = `${lys}%`;
+      document.getElementById('lys-bar').style.width = `${lys}%`;
+      document.getElementById('lys-bar').className = lys >= 70 ? 'h-full bg-emerald-500' : 'h-full bg-rose-500';
+
+      document.getElementById('met-level').innerText = `${met}%`;
+      document.getElementById('met-bar').style.width = `${met}%`;
+      document.getElementById('met-bar').className = met >= 70 ? 'h-full bg-emerald-500' : 'h-full bg-rose-500';
+
+      document.getElementById('diet-verdict-text').innerHTML = verdict;
+      renderMath();
+    }
+
+    // ==========================================
+    // MAIN RAF ANIMATION LOOP
+    // ==========================================
+    function mainAnimationLoop() {
+      // 1. Render 3D Molecule if Tab 1 is visible
+      if (currentTab === 1 && threeRenderer && threeScene && threeCamera) {
+        if (molGroup) {
+          molGroup.rotation.y += 0.003; // Gentle auto-rotation
+        }
+        threeRenderer.render(threeScene, threeCamera);
+      }
+
+      // 2. Render 2D Folding Canvas if Tab 2 is visible
+      if (currentTab === 2) {
+        drawFoldingCanvas();
+      }
+
+      requestAnimationFrame(mainAnimationLoop);
+    }
+  </script>
+</body>
+</html>
